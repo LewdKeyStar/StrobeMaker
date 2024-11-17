@@ -4,10 +4,7 @@ from typing import ClassVar, Tuple
 from BWColor import BWColor
 from Resolution import Resolution
 
-from os import path as ospath
 from PIL import Image, ImageDraw, ImageFont
-
-from constants import ASSETS_PATH
 
 @dataclass
 class MovieFrame:
