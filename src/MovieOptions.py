@@ -10,6 +10,7 @@ class MovieOptions:
 
     font = "HelveticaNeue"
     text_size = 150
+    text_border = True
     capitalize_all = True
 
     images_path = ""

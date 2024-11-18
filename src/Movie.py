@@ -39,6 +39,7 @@ class Movie:
                             BWColor("WHITE"),
                             text = line.upper() if self.options.capitalize_all else line,
                             text_size = self.options.text_size,
+                            text_border = self.options.text_border,
                             font_path = Movie.get_font_path(self.options.font)
                         ).create_image()
                     )

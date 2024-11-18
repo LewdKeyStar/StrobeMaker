@@ -12,6 +12,7 @@ class MovieFrame:
     bg_color: BWColor
     text: str
     text_size: int
+    text_border: bool
     font_path: str
 
     UPLEFT_CORNER: ClassVar[Tuple[int, int]] = (0, 0)
@@ -41,7 +42,7 @@ class MovieFrame:
             ),
             self.text,
             font = font,
-            fill = int(self.bg_color),
+            fill = int(self.bg_color) if self.text_border else int(~self.bg_color),
             stroke_fill = int(~self.bg_color),
             stroke_width = self.stroke_width()
         )
@@ -49,4 +50,4 @@ class MovieFrame:
         return frame_canvas
 
     def stroke_width(self):
-        return int(0.1 * self.text_size)
+        return int(0.1 * self.text_size) if self.text_border else 0
