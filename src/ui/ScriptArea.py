@@ -18,6 +18,8 @@ class ScriptArea(ft.Row):
             text_align = ft.TextAlign.JUSTIFY
         )
 
+        self.update_script_field_capitalize()
+
         # Yes, Flet doesn't support clear icons built-in on text fields.
         # They are only available on search bars.
         # Why ?!
@@ -26,6 +28,12 @@ class ScriptArea(ft.Row):
             icon = ft.icons.CLEAR,
             tooltip = "Clear script text",
             on_click = lambda _ : self.clear()
+        )
+
+        self.capitalize_cb = ft.Checkbox(
+            label = "Capitalize script",
+            value = True,
+            on_change = lambda _ : self.update_capitalize()
         )
 
         self.script_picker = ft.FilePicker(
@@ -46,17 +54,59 @@ class ScriptArea(ft.Row):
 
         super().__init__(
             [
-                self.script_field,
-                self.clear_button,
-                self.upload_button
+                ft.Column(
+                    [
+                        ft.Row(
+                            [
+                                self.script_field,
+                                self.clear_button,
+                                self.upload_button
+                            ],
+
+                            alignment = ft.MainAxisAlignment.START
+                        ),
+                        ft.Row(
+                            [
+                                self.capitalize_cb
+                            ],
+
+                            alignment = ft.MainAxisAlignment.START
+                        )
+                    ]
+                )
             ],
+
             alignment = ft.MainAxisAlignment.CENTER
         )
 
-    def clear(self):
+    def clear(self, update_enabled = True):
         self.script_field.value = ""
         self.page.update()
-        self.generate_area.update_enabled()
+
+        if update_enabled:
+            self.generate_area.update_enabled()
+
+    def update_script_field_capitalize(self):
+        self.script_field.capitalization = \
+            ft.TextCapitalization.CHARACTERS if self.options.capitalize_all \
+            else None # The .NONE value of the enum doesn't work for some reason
+
+    def update_capitalize(self):
+        self.options.capitalize_all = self.capitalize_cb.value
+        self.update_script_field_capitalize()
+
+        # Update text field content from new capitalization value.
+        # Yes, I have to do this manually.
+        # This framework doesn't even handle this.
+        # I swear to God.
+
+        old_val = self.script_field.value
+        self.clear(update_enabled = False)
+        self.script_field.value = \
+            old_val.upper() if self.script_field.capitalization \
+            else "\n".join([line[0].upper() + line[1:].lower() for line in old_val.split('\n')])
+
+        self.page.update()
 
     def upload_script(self, picker_result_event):
         if picker_result_event.files is None:

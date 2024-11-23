@@ -31,7 +31,7 @@ def main(page: ft.Page):
     page.add(
         ft.Container(
             content = script_area,
-            margin = ft.margin.only(bottom = 20),
+            margin = ft.margin.only(bottom = 20)
         ),
         generate_area
     )
