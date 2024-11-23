@@ -57,6 +57,8 @@ class Movie:
             framerate = self.options.output_framerate
         ).output(
             self.options.output_path
-        ).run()
+        ).run(
+            overwrite_output = True
+        )
 
         rmtree(TEMP_OUTPUT_PATH)

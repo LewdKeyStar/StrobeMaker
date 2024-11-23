@@ -10,6 +10,8 @@ class GenerateArea(ft.Row):
         self.page = page
         self.options = options
 
+        self.confirm_modal = None
+
         self.output_path_field = ft.TextField(
             label = "Save as...",
             value = self.options.output_path,
@@ -47,7 +49,7 @@ class GenerateArea(ft.Row):
                     ft.ControlState.DISABLED: ft.colors.WHITE10
                 }
             ),
-            on_click = lambda _ : self.generate()
+            on_click = lambda _ : self.generate_wrapper()
         )
 
         super().__init__(
@@ -74,5 +76,35 @@ class GenerateArea(ft.Row):
         self.output_path_field.value = picker_result_event.path
         self.update_output_path()
 
+    def generate_wrapper(self):
+
+        if ospath.exists(self.options.output_path):
+
+            # FIXME : for some reason, even though this is a modal dialog,
+            # it doesn't close when I click outside of it ??
+            # What the fuck is this framework man
+
+            self.confirm_modal = ft.AlertDialog(
+                modal = True,
+                title = ft.Text("File already exists"),
+                content = ft.Text(f'Do you wish to overwrite the existing file by the name of \"{ ospath.basename(self.options.output_path) }\" ?'),
+                actions = [
+                    ft.FilledButton("Yes", on_click = lambda _ : self.generate()),
+                    ft.TextButton("No", on_click = lambda _ : self.close_confirm_modal())
+                ],
+                actions_alignment = ft.MainAxisAlignment.END,
+            )
+
+            self.page.open(self.confirm_modal)
+
+        else:
+            self.generate()
+
+    def close_confirm_modal(self):
+        if self.confirm_modal is not None:
+            self.page.close(self.confirm_modal)
+            self.confirm_modal = None
+
     def generate(self):
         Movie(self.script_field.value.split('\n'), self.options).create_movie()
+        self.close_confirm_modal()
