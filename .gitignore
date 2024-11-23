@@ -1,2 +1,4 @@
 venv/
 src/__pycache__/
+src/business/__pycache__
+src/ui/__pycache__

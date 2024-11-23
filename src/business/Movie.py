@@ -6,9 +6,9 @@ from PIL import ImageOps
 from os import makedirs, path as ospath
 from shutil import rmtree
 
-from MovieOptions import MovieOptions
-from MovieFrame import MovieFrame
-from BWColor import BWColor
+from business.MovieOptions import MovieOptions
+from business.MovieFrame import MovieFrame
+from business.BWColor import BWColor
 
 from constants import ASSETS_PATH, TEMP_OUTPUT_PATH
 
@@ -46,6 +46,7 @@ class Movie:
                 )
 
         makedirs(TEMP_OUTPUT_PATH)
+        makedirs(ospath.dirname(self.options.output_path))
 
         for i, frame in enumerate(frames):
             frame.save(ospath.join(TEMP_OUTPUT_PATH, f"{'%04d' % i}.png"))

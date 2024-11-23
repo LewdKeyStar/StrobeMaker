@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import ClassVar, Tuple
 
-from BWColor import BWColor
-from Resolution import Resolution
+from business.BWColor import BWColor
+from business.Resolution import Resolution
 
 from PIL import Image, ImageDraw, ImageFont
 

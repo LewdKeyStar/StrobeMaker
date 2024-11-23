@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 
-from Resolution import Resolution
+from business.Resolution import Resolution
+
+from constants import DEFAULT_OUTPUT_PATH
+from os import path as ospath
 
 @dataclass
 class MovieOptions:
@@ -21,4 +24,4 @@ class MovieOptions:
     sound_binaural_freq_lo = 121
 
     output_framerate = 30
-    output_path = "output.mp4"
+    output_path = ospath.join(DEFAULT_OUTPUT_PATH, "output.mp4")
