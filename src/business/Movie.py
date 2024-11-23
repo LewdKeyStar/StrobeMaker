@@ -45,8 +45,9 @@ class Movie:
                     )
                 )
 
+        rmtree(TEMP_OUTPUT_PATH, ignore_errors = True)
         makedirs(TEMP_OUTPUT_PATH)
-        makedirs(ospath.dirname(self.options.output_path))
+        makedirs(ospath.dirname(self.options.output_path), exist_ok = True)
 
         for i, frame in enumerate(frames):
             frame.save(ospath.join(TEMP_OUTPUT_PATH, f"{'%04d' % i}.png"))
