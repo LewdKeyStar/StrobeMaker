@@ -10,6 +10,7 @@ class ScriptArea(ft.Row):
         self.options = options
 
         self.script_field = ft.TextField(
+            autofocus = True,
             label = "Video script",
             hint_text = "Enter words to flash or upload a file",
             value = "",
@@ -116,6 +117,8 @@ class ScriptArea(ft.Row):
             self.script_field.value = \
                 (script_file.read().upper() if self.options.capitalize_all \
                 else script_file.read()).strip()
+
+        self.script_field.focus()
 
         self.page.update()
         # Yes, in that order.
