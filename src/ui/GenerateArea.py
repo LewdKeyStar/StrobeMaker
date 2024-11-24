@@ -103,5 +103,27 @@ class GenerateArea(ft.Row):
             self.confirm_dialog = None
 
     def generate(self):
+        generate_dialog = ft.AlertDialog(
+            modal = True,
+            content = ft.Container(
+                content = ft.Row(
+                    [
+                        # TODO : replace with ffmpeg-derived progress bar
+                        # (see https://github.com/kkroening/ffmpeg-python/blob/master/examples/show_progress.py)
+                        ft.ProgressRing(),
+                        ft.Text("Generating movie...")
+                    ],
+
+                    alignment = ft.MainAxisAlignment.CENTER
+                ),
+
+                # The arbitrary values, they never end
+                padding = ft.padding.only(top = 30)
+            )
+        )
+
+        self.page.open(generate_dialog)
         Movie(self.script_field.value.split('\n'), self.options).create_movie()
+        self.page.close(generate_dialog)
+
         self.close_confirm_dialog()
