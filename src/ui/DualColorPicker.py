@@ -19,12 +19,11 @@ class DualColorPicker(ft.Row):
         )
 
         self.main_color_picker_dialog = ft.AlertDialog(
-            modal = True,
             title = ft.Text("Select main movie color"),
             content = self.main_color_picker,
             actions = [
                 ft.FilledButton("Select", on_click = lambda _ : self.set_color("main")),
-                ft.TextButton("Cancel", on_click = lambda _ : self.close_modal("main"))
+                ft.TextButton("Cancel", on_click = lambda _ : self.close_dialog("main"))
             ],
             actions_alignment = ft.MainAxisAlignment.END,
         )
@@ -50,12 +49,11 @@ class DualColorPicker(ft.Row):
         )
 
         self.inverse_color_picker_dialog = ft.AlertDialog(
-            modal = True,
             title = ft.Text("Select inverse movie color"),
             content = self.inverse_color_picker,
             actions = [
                 ft.FilledButton("Select", on_click = lambda _ : self.set_color("inverse")),
-                ft.TextButton("Cancel", on_click = lambda _ : self.close_modal("inverse"))
+                ft.TextButton("Cancel", on_click = lambda _ : self.close_dialog("inverse"))
             ],
             actions_alignment = ft.MainAxisAlignment.END
         )
@@ -83,7 +81,7 @@ class DualColorPicker(ft.Row):
             ]
         )
 
-    def close_modal(self, which):
+    def close_dialog(self, which):
         self.page.close(
             getattr(self, f'{which}_color_picker_dialog')
         )
@@ -99,4 +97,4 @@ class DualColorPicker(ft.Row):
 
         setattr(self.options, f'{which}_color', hex_to_tuple(relevant_picker.color))
 
-        self.close_modal(which)
+        self.close_dialog(which)
