@@ -46,9 +46,11 @@ def main(page: ft.Page):
                                 width = 500, # otherwise the column is the full width of the app,
                                 # and this, for some reason, fucks up the cross axis alignment
                                 # (the color picker ends up left, but the script area is centered)
-                                # I'm not even sure the alignment has any effect right now :
-                                # It was STRETCH during testing and its appearance was identical
-                                horizontal_alignment = ft.CrossAxisAlignment.START,
+
+                                # Actually, the alignment does fuck-all as is :
+                                # It's supposed to be center, but the children are aligned left.
+                                # Even CSS works better than this.
+                                horizontal_alignment = ft.CrossAxisAlignment.CENTER,
                             ),
 
                             # For some reason
