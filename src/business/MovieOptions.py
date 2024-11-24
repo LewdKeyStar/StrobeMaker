@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Tuple
 
 from business.Resolution import Resolution
 
@@ -7,6 +8,9 @@ from os import path as ospath
 
 @dataclass
 class MovieOptions:
+
+    main_color: Tuple[float, float, float] = (255, 255, 255)
+    inverse_color: Tuple[float, float, float] = (0, 0, 0)
 
     resolution = Resolution(1920, 1080)
     phrase_duration = 3 # counted in flashes, one flash = one white + one black

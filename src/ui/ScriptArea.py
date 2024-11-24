@@ -1,6 +1,6 @@
 import flet as ft
 
-MAX_LINES = 10
+MAX_LINES = 5
 # SCRIPT_WIDTH = 300
 
 class ScriptArea(ft.Row):

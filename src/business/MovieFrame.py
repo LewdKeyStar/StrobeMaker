@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import ClassVar, Tuple
 
-from business.BWColor import BWColor
+from business.ReversibleColor import ReversibleColor
 from business.Resolution import Resolution
 
 from PIL import Image, ImageDraw, ImageFont
@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 @dataclass
 class MovieFrame:
     resolution: Resolution
-    bg_color: BWColor
+    bg_color: ReversibleColor
     text: str
     text_size: int
     text_border: bool
@@ -17,9 +17,19 @@ class MovieFrame:
 
     UPLEFT_CORNER: ClassVar[Tuple[int, int]] = (0, 0)
 
+    def __invert__(self):
+        return MovieFrame(
+            resolution = self.resolution,
+            bg_color = ~self.bg_color,
+            text = self.text,
+            text_size = self.text_size,
+            text_border = self.text_border,
+            font_path = self.font_path
+        )
+
     def create_image(self):
 
-        frame_canvas = Image.new("1", self.resolution.to_tuple(), int(self.bg_color))
+        frame_canvas = Image.new("RGB", tuple(self.resolution), tuple(self.bg_color))
 
         drawer = ImageDraw.Draw(frame_canvas)
 
@@ -42,8 +52,8 @@ class MovieFrame:
             ),
             self.text,
             font = font,
-            fill = int(self.bg_color) if self.text_border else int(~self.bg_color),
-            stroke_fill = int(~self.bg_color),
+            fill = tuple(self.bg_color) if self.text_border else tuple(~self.bg_color),
+            stroke_fill = tuple(~self.bg_color),
             stroke_width = self.stroke_width()
         )
 

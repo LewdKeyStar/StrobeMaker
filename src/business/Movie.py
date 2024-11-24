@@ -8,7 +8,7 @@ from shutil import rmtree
 
 from business.MovieOptions import MovieOptions
 from business.MovieFrame import MovieFrame
-from business.BWColor import BWColor
+from business.ReversibleColor import ReversibleColor
 
 from constants import ASSETS_PATH, TEMP_OUTPUT_PATH
 
@@ -20,7 +20,7 @@ class Movie:
 
     @staticmethod
     def flash_pair(image):
-        return [image, ImageOps.invert(image)]
+        return [image, ~image]
 
     @staticmethod
     def get_font_path(font_name):
@@ -33,15 +33,19 @@ class Movie:
 
             for i in range(self.options.phrase_duration):
                 frames.extend(
+                    frame.create_image()
+
+                    for frame in
+
                     Movie.flash_pair(
                         MovieFrame(
                             self.options.resolution,
-                            BWColor("WHITE"),
+                            ReversibleColor(self.options.main_color, self.options.inverse_color),
                             text = line.upper() if self.options.capitalize_all else line,
                             text_size = self.options.text_size,
                             text_border = self.options.text_border,
                             font_path = Movie.get_font_path(self.options.font)
-                        ).create_image()
+                        )
                     )
                 )
 

@@ -17,6 +17,8 @@ class GenerateArea(ft.Row):
             value = self.options.output_path,
             max_lines = 1,
             text_align = ft.TextAlign.LEFT,
+            width = 1000, # I hate arbitrary units
+            # Isn't %-based sizing a thing in this framework ?!
 
             on_change = self.update_output_path
         )
