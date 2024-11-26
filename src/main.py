@@ -2,13 +2,15 @@ import flet as ft
 
 from business.MovieOptions import MovieOptions
 from business.Movie import Movie
+from utils.MovieOptionsWrapper import MovieOptionsWrapper
 
 from ui.GenerateArea import GenerateArea
 from ui.ScriptArea import ScriptArea
 from ui.DualColorPicker import DualColorPicker
+from ui.VideoPreview import VideoPreview
 
 def main(page: ft.Page):
-    options = MovieOptions()
+    options = MovieOptions() # with the video preview, this should be MovieOptionsWrapper(page)
 
     page.title = "StrobeMaker"
     page.vertical_alignment = ft.MainAxisAlignment.SPACE_BETWEEN
@@ -26,8 +28,12 @@ def main(page: ft.Page):
     # But that just can't scale.
 
     generate_area.script_field = script_area.script_field
-    script_area.script_field.on_change = lambda _ : generate_area.update_enabled()
+    script_area.script_field.on_change = lambda _ : generate_area.update_enabled() # with the video preview, this should be options.wrap(generate_area.update_enabled
     script_area.generate_area = generate_area
+
+    # FIXME : The video preview is unfeasible. See below.
+    # video_preview = VideoPreview(script_area.script_field, options)
+    # page.pubsub.subscribe(lambda _ : video_preview.update_preview())
 
     dual_color_picker = DualColorPicker(page, options)
 
@@ -69,31 +75,17 @@ def main(page: ft.Page):
                         )
                     ),
 
-                    # More arbitrary values, yay !
-                    # The 60 is for left side alignment,
-                    # The -45 is to compensate the stupid card padding
-                    margin = ft.margin.only(left = 60, top = 60, right = -45)
-                ),
-
-                # Stand-in for the video preview (issue #10)
-
-                ft.canvas.Canvas(
-                    [
-                        ft.canvas.Rect(
-                            # TODO : these arbitrary values are at least temporary :
-                            # Canvas elements are ALWAYS absolute positioned,
-                            # so the Row alignment has no bearing on them.
-
-                            # When this becomes a real video preview, we won't have to do this
-                            # ... hopefully
-                            x = 270, y = -50, width = 350, height = 200,
-                            paint = ft.Paint(color = "#FFFFFF", style = ft.PaintingStyle.FILL)
-                        )
-                    ]
+                    # Original values : top and left 60, left -45
+                    # This was with the video preview standin, which has been removed
+                    # Now that the feature appears unusable.
+                    margin = ft.margin.only(top = 10)
                 )
             ],
 
-            # TODO : add alignment when video preview is available
+            # FIXME : it appears impossible to add the VideoPreview control.
+            # The Video controls seems to simply not work on the system ; see #10 for more details.
+
+            alignment = ft.MainAxisAlignment.CENTER
         ),
         generate_area
     )
