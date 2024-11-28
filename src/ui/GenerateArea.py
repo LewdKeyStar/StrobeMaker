@@ -20,7 +20,7 @@ class GenerateArea(ft.Row):
             width = 1000, # I hate arbitrary units
             # Isn't %-based sizing a thing in this framework ?!
 
-            on_change = self.update_output_path
+            on_change = lambda _ : self.update_output_path()
         )
 
         self.output_path_picker = ft.FilePicker(
