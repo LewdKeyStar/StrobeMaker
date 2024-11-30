@@ -21,12 +21,14 @@ class Movie:
     options: MovieOptions = MovieOptions()
 
     @staticmethod
-    def flash_pair(image):
-        return [image, ~image]
-
-    @staticmethod
     def get_font_path(font_name):
         return ospath.join(ASSETS_PATH, f"{font_name}.ttf")
+
+    def flash_group(self, image):
+        return [
+            *[image for i in range(self.options.flash_duration // 2)],
+            *[~image for i in range(self.options.flash_duration // 2)]
+        ]
 
     def create_movie(self, fast = False):
 
@@ -42,7 +44,7 @@ class Movie:
 
                     for frame in
 
-                    Movie.flash_pair(
+                    self.flash_group(
                         MovieFrame(
                             self.options.resolution,
                             ReversibleColor(self.options.main_color, self.options.inverse_color),

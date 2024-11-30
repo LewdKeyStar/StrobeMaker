@@ -13,7 +13,9 @@ class MovieOptions:
     inverse_color: Tuple[float, float, float] = (0, 0, 0)
 
     resolution = Resolution(1920, 1080)
-    phrase_duration = 3 # counted in flashes, one flash = one white + one black
+
+    flash_duration: int = 2 # an even number of frames ; flash_duration / 2 main, flash_duration / 2 inverse
+    phrase_duration: int = 15 # counted in flashes, one flash = one main + one inverse
 
     font = "HelveticaNeue"
     text_size = 150
@@ -29,3 +31,7 @@ class MovieOptions:
 
     output_framerate = 30
     output_path = ospath.join(DEFAULT_OUTPUT_PATH, "output.mp4")
+
+    def calculate_movie_length_ms(self, script):
+        frame_length = self.flash_duration * self.phrase_duration * len(script)
+        return 1000 * frame_length / self.output_framerate
