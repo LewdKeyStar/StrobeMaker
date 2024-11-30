@@ -74,10 +74,18 @@ class DualColorPicker(ft.Row):
             ]
         )
 
+        self.reverse_button = ft.OutlinedButton(
+            icon = ft.icons.SWAP_HORIZ,
+            text = "Swap colors",
+
+            on_click = lambda _ : self.reverse_colors()
+        )
+
         super().__init__(
             [
                 self.main_color_area,
-                self.inverse_color_area
+                self.inverse_color_area,
+                self.reverse_button
             ]
         )
 
@@ -86,15 +94,24 @@ class DualColorPicker(ft.Row):
             getattr(self, f'{which}_color_picker_dialog')
         )
 
+    def update_trigger(self, which):
+        relevant_trigger = getattr(self, f'{which}_color_trigger')
+        relevant_color = tuple_to_hex(getattr(self.options, f'{which}_color'))
+
+        relevant_trigger.icon_color = relevant_color
+        relevant_trigger.bgcolor = relevant_color
+
     def set_color(self, which):
         relevant_picker = getattr(self, f'{which}_color_picker')
-        relevant_trigger = getattr(self, f'{which}_color_trigger')
-
-        relevant_trigger.icon_color = relevant_picker.color
-        relevant_trigger.bgcolor = relevant_picker.color
-
-        self.page.update()
-
         setattr(self.options, f'{which}_color', hex_to_tuple(relevant_picker.color))
 
+        self.update_trigger(which)
+        self.page.update()
+
         self.close_dialog(which)
+
+    def reverse_colors(self):
+        self.options.main_color, self.options.inverse_color = self.options.inverse_color, self.options.main_color
+        self.update_trigger('main')
+        self.update_trigger('inverse')
+        self.page.update()
