@@ -20,16 +20,9 @@ def main(page: ft.Page):
     page.update()
 
     script_area = ScriptArea(page, options)
-    generate_area = GenerateArea(page, options)
+    generate_area = GenerateArea(page, options, script_area.script_field)
 
-    # I don't really know how to handle this circular dependency.
-    # One can have the other in its constructor, but not both,
-    # So it makes the most sense to setup both here.
-    # But that just can't scale.
 
-    generate_area.script_field = script_area.script_field
-    script_area.script_field.on_change = lambda _ : generate_area.update_enabled() # with the video preview, this should be options.wrap(generate_area.update_enabled
-    script_area.generate_area = generate_area
 
     # FIXME : The video preview is unfeasible. See below.
     # video_preview = VideoPreview(script_area.script_field, options)

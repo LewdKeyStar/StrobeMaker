@@ -85,7 +85,7 @@ class ScriptArea(ft.Row):
         self.page.update()
 
         if update_enabled:
-            self.generate_area.update_enabled()
+            self.script_field.on_change(None)
 
     def update_script_field_capitalize(self):
         self.script_field.capitalization = \
@@ -122,4 +122,4 @@ class ScriptArea(ft.Row):
 
         self.page.update()
         # Yes, in that order.
-        self.generate_area.update_enabled()
+        self.script_field.on_change(None)

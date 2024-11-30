@@ -5,10 +5,13 @@ from business.Movie import Movie
 from os import path as ospath
 
 class GenerateArea(ft.Row):
-    def __init__(self, page, options):
+    def __init__(self, page, options, script_field):
 
         self.page = page
         self.options = options
+        self.script_field = script_field
+
+        self.script_field.on_change = lambda _ : self.update_enabled()
 
         self.confirm_dialog = None
 
