@@ -11,7 +11,7 @@ class GenerateArea(ft.Row):
         self.options = options
         self.script_field = script_field
 
-        self.script_field.on_change = lambda _ : self.update_enabled()
+        self.script_field.on_change = lambda _ : options.wrap(self.update_enabled)
 
         self.confirm_dialog = None
 

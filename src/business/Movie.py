@@ -12,6 +12,8 @@ from business.ReversibleColor import ReversibleColor
 
 from constants import ASSETS_PATH, TEMP_OUTPUT_PATH
 
+from time import perf_counter
+
 @dataclass
 class Movie:
 
@@ -26,7 +28,10 @@ class Movie:
     def get_font_path(font_name):
         return ospath.join(ASSETS_PATH, f"{font_name}.ttf")
 
-    def create_movie(self):
+    def create_movie(self, fast = False):
+
+        start_time = perf_counter()
+
         frames = []
 
         for line in self.script:
@@ -49,6 +54,9 @@ class Movie:
                     )
                 )
 
+        print("Wrote movie frames to RAM in", perf_counter() - start_time, "seconds")
+        start_time = perf_counter()
+
         rmtree(TEMP_OUTPUT_PATH, ignore_errors = True)
         makedirs(TEMP_OUTPUT_PATH)
         makedirs(ospath.dirname(self.options.output_path), exist_ok = True)
@@ -56,13 +64,20 @@ class Movie:
         for i, frame in enumerate(frames):
             frame.save(ospath.join(TEMP_OUTPUT_PATH, f"{'%04d' % i}.png"))
 
+        print("Wrote movie frames to disk in", perf_counter() - start_time, "seconds")
+        start_time = perf_counter()
+
         ffmpeg.input(
             ospath.join(TEMP_OUTPUT_PATH, '%04d.png'),
             framerate = self.options.output_framerate
         ).output(
-            self.options.output_path
+            self.options.output_path,
+            crf = 28 if fast else 23,
+            preset = "ultrafast" if fast else "medium"
         ).run(
             overwrite_output = True
         )
+
+        print("Wrote final movie to disk in", perf_counter() - start_time, "seconds")
 
         rmtree(TEMP_OUTPUT_PATH)

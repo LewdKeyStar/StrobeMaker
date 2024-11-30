@@ -9,8 +9,8 @@ from ui.ScriptArea import ScriptArea
 from ui.DualColorPicker import DualColorPicker
 from ui.VideoPreview import VideoPreview
 
-def main(page: ft.Page):
-    options = MovieOptions() # with the video preview, this should be MovieOptionsWrapper(page)
+async def main(page: ft.Page):
+    options = MovieOptionsWrapper(page)
 
     page.title = "StrobeMaker"
     page.vertical_alignment = ft.MainAxisAlignment.SPACE_BETWEEN
@@ -22,11 +22,13 @@ def main(page: ft.Page):
     script_area = ScriptArea(page, options)
     generate_area = GenerateArea(page, options, script_area.script_field)
 
+    video_preview = VideoPreview(script_area.script_field, page, options)
+    await video_preview.update_preview('') # Generate original blank preview
 
+    async def vp_async_wrapper(_):
+        await video_preview.update_preview()
 
-    # FIXME : The video preview is unfeasible. See below.
-    # video_preview = VideoPreview(script_area.script_field, options)
-    # page.pubsub.subscribe(lambda _ : video_preview.update_preview())
+    page.pubsub.subscribe(vp_async_wrapper)
 
     dual_color_picker = DualColorPicker(page, options)
 
@@ -68,20 +70,23 @@ def main(page: ft.Page):
                         )
                     ),
 
-                    # Original values : top and left 60, left -45
-                    # This was with the video preview standin, which has been removed
-                    # Now that the feature appears unusable.
                     margin = ft.margin.only(top = 10)
+                ),
+
+                ft.Container(
+                    content = video_preview,
+                    width = 400,
+                    height = 225,
+                    padding= ft.padding.only(top = 10)
                 )
             ],
-
-            # FIXME : it appears impossible to add the VideoPreview control.
-            # The Video controls seems to simply not work on the system ; see #10 for more details.
 
             alignment = ft.MainAxisAlignment.CENTER
         ),
         generate_area
     )
+
+    video_preview.is_added = True
 
 
 if __name__ == '__main__':

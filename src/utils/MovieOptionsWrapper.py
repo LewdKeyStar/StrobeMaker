@@ -1,12 +1,13 @@
 import flet as ft
 
 from dataclasses import dataclass
+from copy import copy # replace() is not available in Python 3.10
 
 from business.MovieOptions import MovieOptions
 
 from utils.debounce import debounce
 
-DEBOUNCE_TIME = 0.1
+DEBOUNCE_TIME = 0.5
 
 # This class is used to trigger video preview updates on option changes.
 # However, due to the Video control apparently not working on my system
@@ -33,13 +34,11 @@ class MovieOptionsWrapper(MovieOptions):
         return func(*args)
 
     def clone(self, new_vals):
-        cloned_dict = self.__dict__
-
-        del cloned_dict['page']
-
-        cloned_dict.update(new_vals)
-
-        return MovieOptions(**cloned_dict)
+        # replace() is not available in Python 3.10
+        copied = copy(self)
+        for key in new_vals:
+            setattr(copied, key, new_vals[key])
+        return copied
 
     @debounce(DEBOUNCE_TIME)
     def send_message_debounced(self):
