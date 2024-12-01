@@ -61,3 +61,6 @@ class MovieFrame:
 
     def stroke_width(self):
         return int(0.1 * self.text_size) if self.text_border else 0
+
+    def __hash__(self):
+        return hash((self.text, tuple(self.bg_color)))

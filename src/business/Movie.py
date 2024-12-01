@@ -3,7 +3,7 @@ import ffmpeg
 from dataclasses import dataclass
 
 from PIL import ImageOps
-from os import makedirs, path as ospath
+from os import makedirs, symlink, path as ospath
 from shutil import rmtree
 
 from business.MovieOptions import MovieOptions
@@ -24,10 +24,11 @@ class Movie:
     def get_font_path(font_name):
         return ospath.join(ASSETS_PATH, f"{font_name}.ttf")
 
-    def flash_group(self, image):
+    def flash_group(self, image, provided_invert = None):
+        inverted_image = ~image if provided_invert is None else provided_invert
         return [
             *[image for i in range(self.options.flash_duration // 2)],
-            *[~image for i in range(self.options.flash_duration // 2)]
+            *[inverted_image for i in range(self.options.flash_duration // 2)]
         ]
 
     def create_movie(self, fast = False):
@@ -35,26 +36,37 @@ class Movie:
         start_time = perf_counter()
 
         frames = []
+        unique_frames = {}
 
-        for line in self.script:
+        for frame_index, line in enumerate(self.script):
+
+            frame_id = (line, tuple(self.options.main_color))
+            inverse_frame_id = (line, tuple(self.options.inverse_color))
+            is_new_frame = frame_id not in unique_frames
+
+            flash_group = self.flash_group(
+                MovieFrame(
+                    self.options.resolution,
+                    ReversibleColor(self.options.main_color, self.options.inverse_color),
+                    text = line.upper() if self.options.capitalize_all else line,
+                    text_size = self.options.text_size,
+                    text_border = self.options.text_border,
+                    font_path = Movie.get_font_path(self.options.font)
+                )
+
+                if is_new_frame
+
+                else unique_frames[frame_id],
+
+                None if is_new_frame else unique_frames[inverse_frame_id]
+            )
 
             for i in range(self.options.phrase_duration):
-                frames.extend(
-                    frame.create_image()
+                frames.extend(frame for frame in flash_group)
 
-                    for frame in
-
-                    self.flash_group(
-                        MovieFrame(
-                            self.options.resolution,
-                            ReversibleColor(self.options.main_color, self.options.inverse_color),
-                            text = line.upper() if self.options.capitalize_all else line,
-                            text_size = self.options.text_size,
-                            text_border = self.options.text_border,
-                            font_path = Movie.get_font_path(self.options.font)
-                        )
-                    )
-                )
+            if is_new_frame:
+                unique_frames[frame_id] = flash_group[0]
+                unique_frames[inverse_frame_id] = flash_group[self.options.flash_duration // 2]
 
         print("Wrote movie frames to RAM in", perf_counter() - start_time, "seconds")
         start_time = perf_counter()
@@ -63,8 +75,16 @@ class Movie:
         makedirs(TEMP_OUTPUT_PATH)
         makedirs(ospath.dirname(self.options.output_path), exist_ok = True)
 
+        file_paths = {}
+
         for i, frame in enumerate(frames):
-            frame.save(ospath.join(TEMP_OUTPUT_PATH, f"{'%04d' % i}.png"))
+            file_path = ospath.join(TEMP_OUTPUT_PATH, f"{'%04d' % i}.png")
+
+            if frame not in file_paths:
+                frame.create_image().save(file_path)
+                file_paths[frame] = file_path
+            else:
+                symlink(file_paths[frame], file_path)
 
         print("Wrote movie frames to disk in", perf_counter() - start_time, "seconds")
         start_time = perf_counter()
