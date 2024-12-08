@@ -20,8 +20,17 @@ class GenerateArea(ft.Row):
             value = self.options.output_path,
             max_lines = 1,
             text_align = ft.TextAlign.LEFT,
-            width = 1000, # I hate arbitrary units
-            # Isn't %-based sizing a thing in this framework ?!
+            width = 1100, # I hate arbitrary units
+            # Isn't %-based sizing a thing in this framework ?!,
+
+            suffix = ft.IconButton(
+                icon = ft.icons.FOLDER_OPEN,
+                on_click = lambda _ : self.output_path_picker.save_file(
+                    dialog_title = "Select path for output file",
+                    file_name = "output.mp4",
+                    file_type = ft.FilePickerFileType.VIDEO
+                )
+            ),
 
             on_change = lambda _ : self.update_output_path()
         )
@@ -31,15 +40,6 @@ class GenerateArea(ft.Row):
         )
 
         self.page.overlay.append(self.output_path_picker)
-
-        self.pick_path_button = ft.IconButton(
-            icon = ft.icons.FOLDER_OPEN,
-            on_click = lambda _ : self.output_path_picker.save_file(
-                dialog_title = "Select path for output file",
-                file_name = "output.mp4",
-                file_type = ft.FilePickerFileType.VIDEO
-            )
-        )
 
         self.generate_button = ft.FilledButton(
             "Generate",
@@ -60,7 +60,6 @@ class GenerateArea(ft.Row):
         super().__init__(
             [
                 self.output_path_field,
-                self.pick_path_button,
                 self.generate_button
             ],
             alignment = ft.MainAxisAlignment.CENTER
