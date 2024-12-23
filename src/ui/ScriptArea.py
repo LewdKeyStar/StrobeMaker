@@ -105,7 +105,11 @@ class ScriptArea(ft.Row):
         self.clear(update_enabled = False)
         self.script_field.value = \
             old_val.upper() if self.script_field.capitalization \
-            else "\n".join([line[0].upper() + line[1:].lower() for line in old_val.split('\n')])
+            else "\n".join([
+                line[0].upper() + \
+                line[1:].lower() if len(line) > 1 else "" \
+                for line in old_val.split('\n')
+            ])
 
         self.page.update()
 
