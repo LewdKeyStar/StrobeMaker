@@ -44,7 +44,7 @@ async def main(page: ft.Page):
                                     dual_color_picker
                                 ],
 
-                                width = 500, # otherwise the column is the full width of the app,
+                                width = 550, # otherwise the column is the full width of the app,
                                 # and this, for some reason, fucks up the cross axis alignment
                                 # (the color picker ends up left, but the script area is centered)
 
@@ -75,8 +75,8 @@ async def main(page: ft.Page):
 
                 ft.Container(
                     content = video_preview,
-                    width = 400,
-                    height = 225,
+                    width = 480,
+                    height = 270,
                     padding= ft.padding.only(top = 10)
                 )
             ],
