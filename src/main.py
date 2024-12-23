@@ -88,6 +88,12 @@ async def main(page: ft.Page):
 
     video_preview.is_added = True
 
+    # FIXME : I don't know why this is needed.
+    # TextField has an autofocus property,
+    # And it used to work before the introduction of its prefix and suffix icons.
+    # This seems like a framework bug. 
+    script_area.script_field.focus()
+
 
 if __name__ == '__main__':
     ft.app(main)

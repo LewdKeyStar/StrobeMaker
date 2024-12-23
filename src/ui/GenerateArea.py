@@ -11,7 +11,8 @@ class GenerateArea(ft.Row):
         self.options = options
         self.script_field = script_field
 
-        self.script_field.on_change = lambda _ : options.wrap(self.update_enabled)
+        former_on_change = self.script_field.on_change
+        self.script_field.on_change = lambda _ : options.wrap(self.update_enabled, former_on_change)
 
         self.confirm_dialog = None
 
@@ -65,7 +66,8 @@ class GenerateArea(ft.Row):
             alignment = ft.MainAxisAlignment.CENTER
         )
 
-    def update_enabled(self):
+    def update_enabled(self, former_on_change):
+        former_on_change()
         self.generate_button.disabled = self.script_field.value.strip() == ""
         self.page.update()
 
