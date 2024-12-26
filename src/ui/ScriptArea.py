@@ -167,12 +167,32 @@ class ScriptArea(ft.Row):
             alignment = ft.MainAxisAlignment.START
         )
 
-    def clear(self, update_enabled = True):
-        self.script_field.value = ""
-        self.page.update()
+    def clear(self):
+        if self.script_field.value == "":
+            return
 
-        if update_enabled:
-            self.script_field.on_change(None)
+        else:
+
+            def effective_clear():
+                self.script_field.value = ""
+                self.page.update()
+                self.script_field.on_change(None)
+                # The magic of interpreted code : pre-declaration lexical reference
+                self.page.close(clear_confirm_dialog)
+
+            clear_confirm_dialog = ft.AlertDialog(
+                title = ft.Text("Clear video script ?"),
+
+                content = ft.Text("Do you really want to delete this video's script ?"),
+
+                actions = [
+                    ft.FilledButton("Yes", on_click = lambda _ : effective_clear()),
+                    ft.TextButton("No", on_click = lambda _ : self.page.close(clear_confirm_dialog))
+                ],
+                actions_alignment = ft.MainAxisAlignment.END
+            )
+            
+            self.page.open(clear_confirm_dialog)
 
     def update_script_field_value_from_script_window(self):
         self.script_field.value = self.script_window.content.controls[0].value
@@ -198,7 +218,6 @@ class ScriptArea(ft.Row):
         # I swear to God.
 
         old_val = self.script_field.value
-        self.clear(update_enabled = False)
 
         self.script_field.value = \
         self.script_window.content.controls[0].value = \
