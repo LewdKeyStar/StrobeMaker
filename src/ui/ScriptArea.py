@@ -14,6 +14,8 @@ SCRIPT_FIELD_CONTENT_PADDING_LEFT = SCRIPT_FIELD_CONTENT_PADDING_BOTTOM = 20
 SCRIPT_FIELD_CONTENT_PADDING_TOP = -5
 SCRIPT_FIELD_CONTENT_PADDING_TOP_LARGE = 10
 
+TOGGLE_PADDING = -5 # the toggle has baked-in left-hand padding for some goddamn reason
+
 class ScriptArea(ft.Row):
     def __init__(self, page, options):
 
@@ -66,10 +68,15 @@ class ScriptArea(ft.Row):
             )
         )
 
-        self.capitalize_cb = ft.Checkbox(
-            label = "Capitalize script",
-            value = True,
-            on_change = lambda _ : self.update_capitalize()
+        self.capitalize_toggle = ft.Container(
+            ft.Switch(
+                label = "  Capitalize script", # Yes, this is intentional leading whitespace you're seeing
+                # No, this framework does not allow for control labels to define padding
+                # Please save me from this hell
+                value = True,
+                on_change = lambda _ : self.update_capitalize()
+            ),
+            padding = ft.padding.only(left = TOGGLE_PADDING)
         )
 
         self.script_window = ft.AlertDialog(
@@ -109,7 +116,7 @@ class ScriptArea(ft.Row):
                         )
                     ),
 
-                    self.capitalize_cb
+                    self.capitalize_toggle
                 ]
             ),
 
@@ -155,11 +162,7 @@ class ScriptArea(ft.Row):
 
                             alignment = ft.MainAxisAlignment.START
                         ),
-                        ft.Row(
-                            [
-                                self.capitalize_cb
-                            ]
-                        )
+                        self.capitalize_toggle
                     ]
                 )
             ],
@@ -191,7 +194,7 @@ class ScriptArea(ft.Row):
                 ],
                 actions_alignment = ft.MainAxisAlignment.END
             )
-            
+
             self.page.open(clear_confirm_dialog)
 
     def update_script_field_value_from_script_window(self):
@@ -209,7 +212,7 @@ class ScriptArea(ft.Row):
             else None # The .NONE value of the enum doesn't work for some reason
 
     def update_capitalize(self):
-        self.options.capitalize_all = self.capitalize_cb.value
+        self.options.capitalize_all = self.capitalize_toggle.value
         self.update_script_field_capitalize()
 
         # Update text field content from new capitalization value.
