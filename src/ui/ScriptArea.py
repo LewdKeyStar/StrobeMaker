@@ -80,7 +80,7 @@ class ScriptArea(ft.Row):
         )
 
         self.script_window = ft.AlertDialog(
-            title = ft.Text("Edit video script"),
+            title = ft.Text("Edit video script", text_align = ft.TextAlign.CENTER),
 
             content = ft.Column(
                 [
