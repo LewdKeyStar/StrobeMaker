@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Tuple
+from textwrap import dedent
 
 from business.Resolution import Resolution
 
@@ -23,7 +24,7 @@ class MovieOptions:
     capitalize_all = True
 
     images_path = ""
-    image_per_flash = 1
+    images_per_flash = 1
 
     sound = False
     sound_binaural_freq_high = 120
@@ -35,3 +36,13 @@ class MovieOptions:
     def calculate_movie_length_ms(self, script):
         frame_length = self.flash_duration * self.phrase_duration * len(script)
         return 1000 * frame_length / self.output_framerate
+
+    def get_video_section_blurb(self):
+        return dedent(f"""
+        - Resolution : {self.resolution.to_user_format()}px
+        - Framerate : {self.output_framerate}fps
+        - Flash duration : {self.flash_duration} frames
+        - Phrase duration : {self.phrase_duration} flashes
+        - Font size : {self.text_size}pt
+        - With border : {'Yes' if self.text_border else 'No'}
+        """)

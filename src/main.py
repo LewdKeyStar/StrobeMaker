@@ -9,6 +9,8 @@ from ui.ScriptArea import ScriptArea
 from ui.DualColorPicker import DualColorPicker
 from ui.VideoPreview import VideoPreview
 
+from ui.subsections.VideoSection import VideoSection
+
 async def main(page: ft.Page):
     options = MovieOptionsWrapper(page)
 
@@ -83,6 +85,14 @@ async def main(page: ft.Page):
 
             alignment = ft.MainAxisAlignment.CENTER
         ),
+
+        ft.Row(
+            [
+                VideoSection(page, options)
+            ],
+            alignment = ft.MainAxisAlignment.CENTER
+        ),
+
         generate_area
     )
 
@@ -91,7 +101,7 @@ async def main(page: ft.Page):
     # FIXME : I don't know why this is needed.
     # TextField has an autofocus property,
     # And it used to work before the introduction of its prefix and suffix icons.
-    # This seems like a framework bug. 
+    # This seems like a framework bug.
     script_area.script_field.focus()
 
 

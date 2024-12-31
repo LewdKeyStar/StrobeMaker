@@ -12,3 +12,6 @@ class Resolution:
 
         for value in val_list:
             yield value
+
+    def to_user_format(self):
+        return f"{self.width}x{self.height}"
