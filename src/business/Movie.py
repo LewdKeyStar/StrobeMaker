@@ -10,7 +10,7 @@ from business.MovieOptions import MovieOptions
 from business.MovieFrame import MovieFrame
 from business.ReversibleColor import ReversibleColor
 
-from constants import ASSETS_PATH, TEMP_OUTPUT_PATH
+from constants import ASSETS_PATH, TEMP_OUTPUT_PATH, DEFAULT_FONT_LABEL
 
 from time import perf_counter
 
@@ -19,10 +19,6 @@ class Movie:
 
     script: list[str]
     options: MovieOptions = MovieOptions()
-
-    @staticmethod
-    def get_font_path(font_name):
-        return ospath.join(ASSETS_PATH, f"{font_name}.ttf")
 
     def flash_group(self, image, provided_invert = None):
         inverted_image = ~image if provided_invert is None else provided_invert
@@ -51,7 +47,7 @@ class Movie:
                     text = line.upper() if self.options.capitalize_all else line,
                     text_size = self.options.text_size,
                     text_border = self.options.text_border,
-                    font_path = Movie.get_font_path(self.options.font)
+                    font_path = self.options.font_path
                 )
 
                 if is_new_frame

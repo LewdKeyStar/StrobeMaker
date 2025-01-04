@@ -3,6 +3,11 @@ import flet as ft
 from ui.atoms.NumberInput import NumberInput
 from ui.atoms.CustomSlider import CustomSlider
 from ui.atoms.CustomSwitch import CustomSwitch
+from ui.atoms.CustomSearch import CustomSearch
+
+from constants import FONT_LIST, DEFAULT_FONT_LABEL
+
+from pathlib import Path
 
 CONTENT_PADDING = 25
 
@@ -41,13 +46,18 @@ class VideoSection(ft.GestureDetector):
             min = 15,
             max = 120,
 
-            user_on_change = lambda _ : self.update_display(True),
+            user_on_change = lambda _ : self.update_display(update_second_durations = True),
         )
 
-        # Placeholder until we can choose fonts
-        self.font_family_input = ft.TextField(
-            value = "Helvetica Neue",
-            disabled = True
+        self.font_family_input = CustomSearch(
+            self.page,
+            self.options,
+            "font",
+
+            items = [DEFAULT_FONT_LABEL] + FONT_LIST,
+            transform = lambda x : Path(x).stem,
+
+            user_on_change = lambda _ : self.update_display(move_focus = True)
         )
 
         self.font_size_input = NumberInput(
@@ -56,7 +66,7 @@ class VideoSection(ft.GestureDetector):
             "text_size",
 
             min = 60,
-            max = 300,
+            max = 600,
 
             user_on_change = lambda _ : self.update_display()
         )
@@ -78,7 +88,7 @@ class VideoSection(ft.GestureDetector):
             max = 20,
             increment = 2,
 
-            user_on_change = lambda _ : self.update_display(True)
+            user_on_change = lambda _ : self.update_display(update_second_durations = True)
         )
 
         self.flash_duration_seconds = ft.Text(
@@ -95,13 +105,15 @@ class VideoSection(ft.GestureDetector):
             max = 100,
             increment = 1,
 
-            user_on_change = lambda _ : self.update_display(True)
+            user_on_change = lambda _ : self.update_display(update_second_durations = True)
         )
 
         self.phrase_duration_seconds = ft.Text(
             italic = True,
             color = HINT_COLOR
         )
+
+        self.dummy_child = ft.TextField(visible = False)
 
         self.edit_window = ft.AlertDialog(
             title = ft.Text("Edit video settings", text_align = ft.TextAlign.CENTER),
@@ -115,7 +127,9 @@ class VideoSection(ft.GestureDetector):
                         ft.Text("Text settings", size = SECTION_TEXT_SIZE),
                         ft.Row(
                             [
-                                self.font_family_input, self.font_size_input, self.font_border_switch
+                                self.font_family_input,
+                                self.font_size_input,
+                                self.font_border_switch
                             ],
                             alignment = ft.MainAxisAlignment.CENTER
                         ),
@@ -138,7 +152,9 @@ class VideoSection(ft.GestureDetector):
                             ],
 
                             alignment = ft.MainAxisAlignment.SPACE_EVENLY
-                        )
+                        ),
+
+                        self.dummy_child
                     ],
                     alignment = ft.MainAxisAlignment.SPACE_BETWEEN
                 ),
@@ -158,7 +174,7 @@ class VideoSection(ft.GestureDetector):
             on_tap = lambda _ : self.page.open(self.edit_window)
         )
 
-        self.update_display(True)
+        self.update_display(update_second_durations = True)
 
     def update_bgcolor(self, which):
         self.card_container.color = \
@@ -172,7 +188,7 @@ class VideoSection(ft.GestureDetector):
             color = BLURB_COLOR
         )
 
-    def update_display(self, update_second_durations = False):
+    def update_display(self, *, update_second_durations = False, move_focus = False):
         self.update_blurb()
 
         if update_second_durations:
@@ -182,6 +198,13 @@ class VideoSection(ft.GestureDetector):
                 f"({flash_duration_seconds:.2f} seconds)"
             self.phrase_duration_seconds.value = \
                 f"({(self.options.phrase_duration * flash_duration_seconds):.2f} seconds)"
+
+        # It's not intuitive for the font selector to keep focus when the choice has been made.
+        # Since we can't just blur it (there is no blur() method),
+        # Move the focus to the font size input instead,
+        # Since desired font size often changes between fonts.
+        if move_focus:
+            self.font_size_input.focus()
 
         if self.page is not None:
             self.page.update()
