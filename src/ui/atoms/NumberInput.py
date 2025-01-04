@@ -52,7 +52,6 @@ class NumberInput(ft.TextField):
         except Exception:
             int_value = self.min
 
-        print("Clamping : ", max(self.min, min(self.max, int_value)))
         self.value = max(self.min, min(self.max, int_value))
 
     # Debounce the ENTIRE on_change,
