@@ -29,6 +29,5 @@ class CustomSwitch(ft.Switch):
     def on_change_sum(self):
         self.builtin_on_change()
 
-        setattr(self.options, self.property, self.value)
         if self.user_on_change is not None:
             self.user_on_change(None)

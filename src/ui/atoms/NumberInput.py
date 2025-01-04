@@ -54,13 +54,14 @@ class NumberInput(ft.TextField):
 
         self.value = max(self.min, min(self.max, int_value))
 
+        setattr(self.options, self.property, self.value)
+
     # Debounce the ENTIRE on_change,
     # Otherwise the part that is debounced is not awaited, leading to race conditions
     @debounce(ON_CHANGE_DEBOUNCE_TIME)
     def on_change_sum(self):
         self.builtin_on_change()
 
-        setattr(self.options, self.property, self.value)
         if self.user_on_change is not None:
             self.user_on_change(None)
 
