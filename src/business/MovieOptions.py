@@ -20,7 +20,8 @@ class MovieOptions:
     main_color: Tuple[float, float, float] = (255, 255, 255)
     inverse_color: Tuple[float, float, float] = (0, 0, 0)
 
-    resolution = Resolution(1920, 1080)
+    resolution_width = 1920
+    resolution_height = 1080
 
     flash_duration: int = 2 # an even number of frames ; flash_duration / 2 main, flash_duration / 2 inverse
     phrase_duration: int = 15 # counted in flashes, one flash = one main + one inverse
@@ -43,6 +44,10 @@ class MovieOptions:
     def calculate_movie_length_ms(self, script):
         frame_length = self.flash_duration * self.phrase_duration * len(script)
         return 1000 * frame_length / self.output_framerate
+
+    @property
+    def resolution(self):
+        return Resolution(self.resolution_width, self.resolution_height)
 
     @property
     def font_path(self):

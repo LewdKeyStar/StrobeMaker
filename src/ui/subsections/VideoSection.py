@@ -14,7 +14,15 @@ CONTENT_PADDING = 25
 EDIT_WINDOW_WIDTH = 1000
 EDIT_WINDOW_HEIGHT = 500
 
+LARGE_NUMINPUT_WIDTH = 150
+
+LOWRES_WIDTH = 256
+LOWRES_HEIGHT = 144
+HIGHRES_WIDTH = 3840
+HIGHRES_HEIGHT = 2160
+
 SECTION_TEXT_SIZE = 18
+UNIT_TEXT_SIZE = 16
 
 BLURB_COLOR = ft.colors.GREY_300
 HINT_COLOR = ft.colors.GREY_400
@@ -36,6 +44,32 @@ class VideoSection(ft.GestureDetector):
                     left = CONTENT_PADDING
                 )
             )
+        )
+
+        self.resolution_width_input = NumberInput(
+            self.page,
+            self.options,
+            "resolution_width",
+
+            min = LOWRES_WIDTH,
+            max = HIGHRES_WIDTH,
+
+            width = LARGE_NUMINPUT_WIDTH,
+
+            user_on_change = lambda _ : self.update_display()
+        )
+
+        self.resolution_height_input = NumberInput(
+            self.page,
+            self.options,
+            "resolution_height",
+
+            min = LOWRES_HEIGHT,
+            max = HIGHRES_HEIGHT,
+
+            width = LARGE_NUMINPUT_WIDTH,
+
+            user_on_change = lambda _ : self.update_display()
         )
 
         self.fps_input = NumberInput(
@@ -65,8 +99,8 @@ class VideoSection(ft.GestureDetector):
             self.options,
             "text_size",
 
-            min = 60,
-            max = 600,
+            min = 10,
+            max = 1000,
 
             user_on_change = lambda _ : self.update_display()
         )
@@ -121,8 +155,28 @@ class VideoSection(ft.GestureDetector):
             content = ft.Container(
                 ft.Column(
                     [
-                        ft.Text("Framerate", size = SECTION_TEXT_SIZE),
-                        self.fps_input,
+                        ft.Text("Video profile", size = SECTION_TEXT_SIZE),
+                        ft.Row(
+                            [
+                                ft.Row(
+                                    [
+                                        self.resolution_width_input,
+                                        ft.Text("x", size = UNIT_TEXT_SIZE),
+                                        self.resolution_height_input,
+                                        ft.Text("px", size = UNIT_TEXT_SIZE)
+                                    ]
+                                ),
+
+                                ft.Row(
+                                    [
+                                        self.fps_input,
+                                        ft.Text("fps", size = UNIT_TEXT_SIZE)
+                                    ]
+                                )
+                            ],
+
+                            alignment = ft.MainAxisAlignment.SPACE_EVENLY
+                        ),
 
                         ft.Text("Text settings", size = SECTION_TEXT_SIZE),
                         ft.Row(

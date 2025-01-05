@@ -10,10 +10,15 @@ class NumberInput(ft.TextField):
         self, page, options,
         property,
         *,
+
         editable = True,
+
         min = 0,
         max = 200,
         increment = 1,
+
+        width = NUMBER_INPUT_WIDTH,
+        
         user_on_change = None
     ):
 
@@ -41,7 +46,7 @@ class NumberInput(ft.TextField):
                 on_click = lambda _ : self.increment_value(self.increment)
             ),
 
-            width = NUMBER_INPUT_WIDTH,
+            width = width,
 
             on_change = lambda _ : self.on_change_sum()
         )
