@@ -33,7 +33,10 @@ class CustomSearch(ft.SearchBar):
 
         super().__init__(
             value = getattr(self.options, self.property),
-            controls = self.all_controls,
+            controls = [], # Do not initialize with self.all_controls,
+            # Else there is noticeable hang time.
+            # Clicking the view will set all_controls later, so we're square.
+            # Why *that* does not cause hang time, I do not know.
 
             view_trailing = [
                 ft.IconButton(
