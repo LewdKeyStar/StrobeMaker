@@ -68,14 +68,16 @@ class ScriptArea(ft.Row):
             )
         )
 
-        self.capitalize_toggle = ft.Container(
-            ft.Switch(
-                label = "  Capitalize script", # Yes, this is intentional leading whitespace you're seeing
-                # No, this framework does not allow for control labels to define padding
-                # Please save me from this hell
-                value = True,
-                on_change = lambda _ : self.update_capitalize()
-            ),
+        self.capitalize_toggle = ft.Switch(
+            label = "  Capitalize script", # Yes, this is intentional leading whitespace you're seeing
+            # No, this framework does not allow for control labels to define padding
+            # Please save me from this hell
+            value = True,
+            on_change = lambda _ : self.update_capitalize()
+        )
+
+        self.capitalize_toggle_container = ft.Container(
+            self.capitalize_toggle,
             padding = ft.padding.only(left = TOGGLE_PADDING)
         )
 
@@ -116,7 +118,7 @@ class ScriptArea(ft.Row):
                         )
                     ),
 
-                    self.capitalize_toggle
+                    self.capitalize_toggle_container
                 ]
             ),
 
@@ -162,7 +164,7 @@ class ScriptArea(ft.Row):
 
                             alignment = ft.MainAxisAlignment.START
                         ),
-                        self.capitalize_toggle
+                        self.capitalize_toggle_container
                     ]
                 )
             ],
