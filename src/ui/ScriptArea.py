@@ -1,5 +1,10 @@
 import flet as ft
 
+from os import makedirs
+from os.path import dirname
+
+from utils.misc_utils import add_extension_if_missing
+
 MIN_LINES = MAX_LINES = 5
 MIN_LINES_LARGE = MAX_LINES_LARGE = 20
 
@@ -15,6 +20,8 @@ SCRIPT_FIELD_CONTENT_PADDING_TOP = -5
 SCRIPT_FIELD_CONTENT_PADDING_TOP_LARGE = 10
 
 TOGGLE_PADDING = -5 # the toggle has baked-in left-hand padding for some goddamn reason
+
+SCRIPT_FILE_EXTENSION = "txt"
 
 class ScriptArea(ft.Row):
     def __init__(self, page, options):
@@ -136,19 +143,35 @@ class ScriptArea(ft.Row):
 
         self.update_script_field_capitalize()
 
-        self.script_picker = ft.FilePicker(
-            on_result = self.upload_script
+        self.script_importer = ft.FilePicker(
+            on_result = self.import_script
         )
 
-        self.page.overlay.append(self.script_picker)
+        self.page.overlay.append(self.script_importer)
 
-        self.upload_button = ft.FilledTonalButton(
-            "Upload text file",
-            icon=ft.icons.UPLOAD_FILE,
-            on_click = lambda _ : self.script_picker.pick_files(
+        self.import_button = ft.FilledTonalButton(
+            "Import script",
+            icon = ft.icons.DOWNLOAD,
+            on_click = lambda _ : self.script_importer.pick_files(
                 dialog_title = "Select script file",
                 file_type=ft.FilePickerFileType.CUSTOM,
-                allowed_extensions = ['txt']
+                allowed_extensions = [SCRIPT_FILE_EXTENSION]
+            )
+        )
+
+        self.script_exporter = ft.FilePicker(
+            on_result = self.export_script
+        )
+
+        self.page.overlay.append(self.script_exporter)
+
+        self.export_button = ft.FilledTonalButton(
+            "Export script",
+            icon = ft.icons.UPLOAD,
+            on_click = lambda _ : self.script_exporter.save_file(
+                dialog_title = "Save script",
+                file_type = ft.FilePickerFileType.CUSTOM,
+                allowed_extensions = [SCRIPT_FILE_EXTENSION]
             )
         )
 
@@ -159,9 +182,19 @@ class ScriptArea(ft.Row):
                         ft.Row(
                             [
                                 self.script_field,
-                                self.upload_button
+                                ft.Column(
+                                    [
+                                        self.import_button,
+                                        self.export_button
+                                    ]
+                                )
                             ],
 
+                            # FIXME : the two buttons are slightly too much to the left
+                            # but this is the only alignment that WORKS
+                            # space_between and space_evenly just STICK the two children together
+                            # with zero spacing
+                            # fuck. this. framework.
                             alignment = ft.MainAxisAlignment.START
                         ),
                         self.capitalize_toggle_container
@@ -235,7 +268,7 @@ class ScriptArea(ft.Row):
 
         self.page.update()
 
-    def upload_script(self, picker_result_event):
+    def import_script(self, picker_result_event):
         if picker_result_event.files is None:
             return
 
@@ -249,3 +282,20 @@ class ScriptArea(ft.Row):
         self.page.update()
         # Yes, in that order.
         self.script_field.on_change(None)
+
+    def export_script(self, picker_result_event):
+        if picker_result_event.path is None:
+            return
+
+        path = add_extension_if_missing(
+            picker_result_event.path,
+            SCRIPT_FILE_EXTENSION
+        )
+
+        makedirs(
+            dirname(path),
+            exist_ok=True
+        )
+
+        with open(path, mode="w", encoding="utf-8-sig") as writer:
+            writer.write(self.script_field.value)
