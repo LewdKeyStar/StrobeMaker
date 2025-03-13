@@ -2,7 +2,15 @@ import flet as ft
 
 from business.Movie import Movie
 
+from utils.misc_utils import add_extension_if_missing
+
 from os import path as ospath
+
+# Due to how add_extension_if_missing works, we're going to force the MP4 container.
+# It's definitely an acceptable state of affairs for now.
+# (The alternative would be to look through EVERY common video container extension,
+# on every change event.)
+VIDEO_EXTENSION = "mp4"
 
 class GenerateArea(ft.Row):
     def __init__(self, page, options, script_field):
@@ -72,14 +80,19 @@ class GenerateArea(ft.Row):
         self.page.update()
 
     def update_output_path(self):
-        self.options.output_path = self.output_path_field.value
+        self.options.output_path = add_extension_if_missing(
+            self.output_path_field.value,
+            VIDEO_EXTENSION
+        )
         self.page.update()
 
     def pick_output_path(self, picker_result_event):
         if picker_result_event.path is None:
             return
 
-        self.output_path_field.value = picker_result_event.path
+        path = add_extension_if_missing(picker_result_event.path, VIDEO_EXTENSION)
+
+        self.output_path_field.value = path
         self.update_output_path()
 
     def generate_wrapper(self):
