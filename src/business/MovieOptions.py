@@ -41,9 +41,12 @@ class MovieOptions:
     output_framerate = 30
     output_path = ospath.join(DEFAULT_OUTPUT_PATH, "output.mp4")
 
-    def calculate_movie_length_ms(self, script):
+    def calculate_movie_length_frames(self, script):
         frame_length = self.flash_duration * self.phrase_duration * len(script)
-        return 1000 * frame_length / self.output_framerate
+        return frame_length
+
+    def calculate_movie_length_ms(self, script):
+        return 1000 * self.calculate_movie_length_frames(script) / self.output_framerate
 
     @property
     def resolution(self):
