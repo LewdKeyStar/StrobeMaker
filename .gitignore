@@ -1,4 +1,5 @@
 venv/
 output/
+.tmp/
 .preview/
 **/__pycache__
