@@ -10,7 +10,8 @@ from business.MovieOptions import MovieOptions
 from business.MovieFrame import MovieFrame
 from business.ReversibleColor import ReversibleColor
 
-from constants import ASSETS_PATH, TEMP_OUTPUT_PATH, DEFAULT_FONT_LABEL
+from constants import ASSETS_PATH, DEFAULT_FONT_LABEL
+from utils.misc_utils import _tmpdir_scope
 
 from time import perf_counter
 
@@ -67,35 +68,36 @@ class Movie:
         print("Wrote movie frames to RAM in", perf_counter() - start_time, "seconds")
         start_time = perf_counter()
 
-        rmtree(TEMP_OUTPUT_PATH, ignore_errors = True)
-        makedirs(TEMP_OUTPUT_PATH)
         makedirs(ospath.dirname(self.options.output_path), exist_ok = True)
 
-        file_paths = {}
+        with _tmpdir_scope() as tmpdir:
 
-        for i, frame in enumerate(frames):
-            file_path = ospath.join(TEMP_OUTPUT_PATH, f"{'%04d' % i}.png")
+            file_paths = {}
 
-            if frame not in file_paths:
-                frame.create_image().save(file_path)
-                file_paths[frame] = file_path
-            else:
-                symlink(file_paths[frame], file_path)
+            for i, frame in enumerate(frames):
+                file_path = ospath.join(tmpdir, f"{'%04d' % i}.png")
 
-        print("Wrote movie frames to disk in", perf_counter() - start_time, "seconds")
-        start_time = perf_counter()
+                if frame not in file_paths:
+                    frame.create_image().save(file_path)
+                    file_paths[frame] = file_path
+                else:
+                    symlink(file_paths[frame], file_path)
 
-        ffmpeg.input(
-            ospath.join(TEMP_OUTPUT_PATH, '%04d.png'),
-            framerate = self.options.output_framerate
-        ).output(
-            self.options.output_path,
-            crf = 28 if fast else 23,
-            preset = "ultrafast" if fast else "medium"
-        ).run(
-            overwrite_output = True
-        )
+            # I am unable to properly test the increase in perf from using RAM-based tmpdir,
+            # Because it is negligible against an SSD.
 
-        print("Wrote final movie to disk in", perf_counter() - start_time, "seconds")
+            print("Wrote movie frames to disk in", perf_counter() - start_time, "seconds")
+            start_time = perf_counter()
 
-        rmtree(TEMP_OUTPUT_PATH)
+            ffmpeg.input(
+                ospath.join(tmpdir, '%04d.png'),
+                framerate = self.options.output_framerate
+            ).output(
+                self.options.output_path,
+                crf = 28 if fast else 23,
+                preset = "ultrafast" if fast else "medium"
+            ).run(
+                overwrite_output = True
+            )
+
+            print("Wrote final movie to disk in", perf_counter() - start_time, "seconds")

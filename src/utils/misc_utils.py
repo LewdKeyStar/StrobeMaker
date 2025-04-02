@@ -8,3 +8,17 @@
 def add_extension_if_missing(path, ext):
     true_ext = '.' + ext
     return path if path.endswith(true_ext) else path + true_ext
+
+# Taken from https://github.com/kkroening/ffmpeg-python/blob/master/examples/show_progress.py#L8
+
+from contextlib import contextmanager
+from tempfile import mkdtemp
+from shutil import rmtree
+
+@contextmanager
+def _tmpdir_scope():
+    tmpdir = mkdtemp()
+    try:
+        yield tmpdir
+    finally:
+        rmtree(tmpdir)
