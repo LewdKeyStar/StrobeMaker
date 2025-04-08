@@ -11,10 +11,12 @@ from ui.VideoPreview import VideoPreview
 
 from ui.subsections.VideoSection import VideoSection
 
+from constants import APP_TITLE
+
 async def main(page: ft.Page):
     options = MovieOptionsWrapper(page)
 
-    page.title = "StrobeMaker"
+    page.title = APP_TITLE
     page.vertical_alignment = ft.MainAxisAlignment.SPACE_BETWEEN
     page.dark_theme = ft.Theme(primary_color = ft.colors.BLUE) # color_scheme_seed won't work ; WHY ?
     page.theme_mode = ft.ThemeMode.DARK
@@ -24,13 +26,18 @@ async def main(page: ft.Page):
     script_area = ScriptArea(page, options)
     generate_area = GenerateArea(page, options, script_area.script_field)
 
+    def progress_message_handler(t, render_progress):
+        generate_area.update_progress(render_progress)
+
+    page.pubsub.subscribe_topic("progress", progress_message_handler)
+
     video_preview = VideoPreview(script_area.script_field, page, options)
     await video_preview.update_preview('') # Generate original blank preview
 
-    async def vp_async_wrapper(_):
+    async def vp_async_wrapper(t, _):
         await video_preview.update_preview()
 
-    page.pubsub.subscribe(vp_async_wrapper)
+    page.pubsub.subscribe_topic("preview", vp_async_wrapper)
 
     dual_color_picker = DualColorPicker(page, options)
 

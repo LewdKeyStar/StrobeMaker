@@ -1,4 +1,5 @@
 import ffmpeg
+import threading
 
 from dataclasses import dataclass
 
@@ -12,6 +13,7 @@ from business.ReversibleColor import ReversibleColor
 
 from constants import ASSETS_PATH, DEFAULT_FONT_LABEL
 from utils.misc_utils import _tmpdir_scope
+from utils.ffmpeg_progress import track_ffmpeg_progress
 
 from time import perf_counter
 
@@ -28,7 +30,7 @@ class Movie:
             *[inverted_image for i in range(self.options.flash_duration // 2)]
         ]
 
-    def create_movie(self, fast = False):
+    def create_movie(self, *, fast = False, pubsub = None):
 
         start_time = perf_counter()
 
@@ -89,15 +91,30 @@ class Movie:
             print("Wrote movie frames to disk in", perf_counter() - start_time, "seconds")
             start_time = perf_counter()
 
-            ffmpeg.input(
-                ospath.join(tmpdir, '%04d.png'),
-                framerate = self.options.output_framerate
-            ).output(
-                self.options.output_path,
-                crf = 28 if fast else 23,
-                preset = "ultrafast" if fast else "medium"
-            ).run(
-                overwrite_output = True
-            )
+            socket_filename = ospath.join(tmpdir, "progress_socket")
+
+            def render():
+                ffmpeg.input(
+                    ospath.join(tmpdir, '%04d.png'),
+                    framerate = self.options.output_framerate
+                ).output(
+                    self.options.output_path,
+                    crf = 28 if fast else 23,
+                    preset = "ultrafast" if fast else "medium"
+                ).global_args(
+                    "-hide_banner", # suppress startup print (version, etc.)
+                    "-loglevel", "error",
+                    "-progress", f"unix://{socket_filename}", # unix:// prefix makes this a valid resource URL !
+                    "-y", # use -y, not overwrite_output, because the latter is ignored when global_args() is used
+                ).run_async().wait() # run_async() is necessary when piping output
+
+            t1 = threading.Thread(target = render)
+            t2 = threading.Thread(target = track_ffmpeg_progress, args = (socket_filename, pubsub))
+
+            t1.start()
+            t2.start()
+
+            t1.join()
+            t2.join()
 
             print("Wrote final movie to disk in", perf_counter() - start_time, "seconds")

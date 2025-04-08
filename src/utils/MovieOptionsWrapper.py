@@ -42,4 +42,4 @@ class MovieOptionsWrapper(MovieOptions):
 
     @debounce(DEBOUNCE_TIME)
     def send_message_debounced(self):
-        self.page.pubsub.send_all("Update preview")
+        self.page.pubsub.send_all_on_topic("preview", "Update preview")
