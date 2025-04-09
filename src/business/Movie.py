@@ -80,7 +80,7 @@ class Movie:
                 file_path = ospath.join(tmpdir, f"{'%04d' % i}.png")
 
                 if frame not in file_paths:
-                    frame.create_image().save(file_path)
+                    frame.create_image().save(file_path, compress_level = 1)
                     file_paths[frame] = file_path
                 else:
                     symlink(file_paths[frame], file_path)
