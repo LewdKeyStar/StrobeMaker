@@ -42,7 +42,7 @@ class MovieFrame:
             MovieFrame.UPLEFT_CORNER,
             self.text,
             font = font,
-            stroke_width = self.stroke_width()
+            stroke_width = self.stroke_width
         )
 
         drawer.text(
@@ -54,11 +54,12 @@ class MovieFrame:
             font = font,
             fill = tuple(self.bg_color) if self.text_border else tuple(~self.bg_color),
             stroke_fill = tuple(~self.bg_color),
-            stroke_width = self.stroke_width()
+            stroke_width = self.stroke_width
         )
 
         return frame_canvas
 
+    @property
     def stroke_width(self):
         return int(0.1 * self.text_size) if self.text_border else 0
 
