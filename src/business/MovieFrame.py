@@ -6,6 +6,9 @@ from business.Resolution import Resolution
 
 from PIL import Image, ImageDraw, ImageFont
 
+BG_COLOR_INDEX = 0
+TEXT_COLOR_INDEX = 1
+
 @dataclass
 class MovieFrame:
     resolution: Resolution
@@ -29,7 +32,7 @@ class MovieFrame:
 
     def create_image(self):
 
-        frame_canvas = Image.new("RGB", tuple(self.resolution), tuple(self.bg_color))
+        frame_canvas = Image.new("P", tuple(self.resolution), BG_COLOR_INDEX)
 
         drawer = ImageDraw.Draw(frame_canvas)
 
@@ -52,16 +55,26 @@ class MovieFrame:
             ),
             self.text,
             font = font,
-            fill = tuple(self.bg_color) if self.text_border else tuple(~self.bg_color),
-            stroke_fill = tuple(~self.bg_color),
+            fill = BG_COLOR_INDEX if self.text_border else TEXT_COLOR_INDEX,
+            stroke_fill = TEXT_COLOR_INDEX,
             stroke_width = self.stroke_width
         )
 
+        frame_canvas.putpalette(self.palette)
+
         return frame_canvas
+
+    @property
+    def palette(self):
+        return [
+            *tuple(self.bg_color), *tuple(~self.bg_color)
+        ]
 
     @property
     def stroke_width(self):
         return int(0.1 * self.text_size) if self.text_border else 0
 
+    # TODO : we'll have to add font size to this,
+    # if we want to manage variable font size in movie
     def __hash__(self):
         return hash((self.text, tuple(self.bg_color)))
