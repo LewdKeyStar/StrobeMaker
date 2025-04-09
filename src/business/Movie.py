@@ -67,7 +67,8 @@ class Movie:
                 unique_frames[frame_id] = flash_group[0]
                 unique_frames[inverse_frame_id] = flash_group[self.options.flash_duration // 2]
 
-        print("Wrote movie frames to RAM in", perf_counter() - start_time, "seconds")
+        dt_movie_frames_objects = perf_counter() - start_time
+        print("Created movie frame objects in", dt_movie_frames_objects, "seconds")
         start_time = perf_counter()
 
         makedirs(ospath.dirname(self.options.output_path), exist_ok = True)
@@ -88,7 +89,8 @@ class Movie:
             # I am unable to properly test the increase in perf from using RAM-based tmpdir,
             # Because it is negligible against an SSD.
 
-            print("Wrote movie frames to disk in", perf_counter() - start_time, "seconds")
+            dt_movie_frames_write = perf_counter() - start_time
+            print("Wrote movie frames to RAM in", dt_movie_frames_write, "seconds")
             start_time = perf_counter()
 
             socket_filename = ospath.join(tmpdir, "progress_socket")
@@ -117,4 +119,11 @@ class Movie:
             t1.join()
             t2.join()
 
-            print("Wrote final movie to disk in", perf_counter() - start_time, "seconds")
+            dt_movie_render = perf_counter() - start_time
+            print("Wrote final movie to disk in", dt_movie_render, "seconds")
+
+            print(
+                "Total render time :",
+                dt_movie_frames_objects + dt_movie_frames_write + dt_movie_render,
+                "seconds"
+            )
