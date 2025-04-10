@@ -6,6 +6,9 @@ from utils.misc_utils import add_extension_if_missing
 
 from os import path as ospath
 from datetime import timedelta
+from threading import Timer
+
+from utils.open_file import open_file
 
 from constants import APP_TITLE
 
@@ -18,6 +21,8 @@ GENERATING_MESSAGE = "Rendering video..."
 
 # TODO : factorize with VideoSection into some sort of style file?
 HINT_COLOR = ft.colors.GREY_400
+
+BANNER_DURATION = 5.0 # seconds
 
 class GenerateArea(ft.Row):
     def __init__(self, page, options, script_field):
@@ -164,6 +169,33 @@ class GenerateArea(ft.Row):
 
         # Ugly as fuck, but where else could we put it ?
         self.close_confirm_dialog()
+
+        self.success_banner = ft.Banner(
+            bgcolor = ft.colors.GREEN_400,
+            leading = ft.Icon(
+                ft.icons.CHECK,
+                color = ft.colors.WHITE
+            ),
+            content = ft.Text(
+                "Video successfully rendered",
+                color = ft.colors.WHITE
+            ),
+            actions = [
+                ft.TextButton(
+                    text = "Open",
+                    style = ft.ButtonStyle(color = ft.colors.WHITE),
+                    on_click = lambda _ : open_file(self.options.output_path)
+                )
+            ]
+        )
+
+        self.page.open(self.success_banner)
+
+        Timer(BANNER_DURATION, lambda _ : self.close_success_banner(), (None,)).start()
+
+    def close_success_banner(self):
+        # TODO : delay closing if mouse is currently over the "Open" button
+        self.page.close(self.success_banner)
 
     def update_progress(self, render_progress):
 
