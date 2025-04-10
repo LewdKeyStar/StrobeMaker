@@ -19,7 +19,7 @@ class DualColorPicker(ft.Row):
         )
 
         self.main_color_picker_dialog = ft.AlertDialog(
-            title = ft.Text("Select main movie color"),
+            title = ft.Text("Select main frame color"),
             content = self.main_color_picker,
             actions = [
                 ft.FilledButton("Select", on_click = lambda _ : self.set_color("main")),
@@ -49,7 +49,7 @@ class DualColorPicker(ft.Row):
         )
 
         self.inverse_color_picker_dialog = ft.AlertDialog(
-            title = ft.Text("Select inverse movie color"),
+            title = ft.Text("Select inverse frame color"),
             content = self.inverse_color_picker,
             actions = [
                 ft.FilledButton("Select", on_click = lambda _ : self.set_color("inverse")),
