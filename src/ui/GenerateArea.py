@@ -171,7 +171,7 @@ class GenerateArea(ft.Row):
         self.close_confirm_dialog()
 
         self.success_banner = ft.Banner(
-            bgcolor = ft.colors.GREEN_400,
+            bgcolor = ft.colors.GREEN_600,
             leading = ft.Icon(
                 ft.icons.CHECK,
                 color = ft.colors.WHITE
