@@ -170,6 +170,18 @@ class GenerateArea(ft.Row):
         # Ugly as fuck, but where else could we put it ?
         self.close_confirm_dialog()
 
+        # Semantically, according to Material design, this *should* be a SnackBar.
+        # However, there are two reasons against it :
+
+        # 1. A SnackBar always appears at the bottom of the display.
+        # On a computer screen, this leads to poor legibility.
+        # This is a problem with the Material spec itself.
+
+        # 2. In Flet specifically, the SnackBar action is bone dry :
+        # it is constructed purely as a string + an on_action() handler.
+        # There is no control over the action...control ; its instance is not accessible.
+        # This means there is nothing that can be done about auto-closing when hovering.
+
         self.success_banner = ft.Banner(
             bgcolor = ft.colors.GREEN_600,
             leading = ft.Icon(
@@ -181,20 +193,33 @@ class GenerateArea(ft.Row):
                 color = ft.colors.WHITE
             ),
             actions = [
-                ft.TextButton(
-                    text = "Open",
-                    style = ft.ButtonStyle(color = ft.colors.WHITE),
-                    on_click = lambda _ : open_file(self.options.output_path)
+                ft.GestureDetector(
+                    content = ft.TextButton(
+                        text = "Open",
+                        style = ft.ButtonStyle(color = ft.colors.WHITE),
+                        on_click = lambda _ : open_file(self.options.output_path)
+                    ),
+
+                    on_enter = lambda _ : self.delay_banner_close(),
+                    on_exit = lambda _ : self.close_success_banner()
                 )
             ]
         )
 
         self.page.open(self.success_banner)
 
-        Timer(BANNER_DURATION, lambda _ : self.close_success_banner(), (None,)).start()
+        # Because we cannot use a SnackBar, we have to auto-close our banner,
+        # Further contradicting the Material spec.
+        # Yay cursed code UwU
+
+        self.banner_close_timer = Timer(BANNER_DURATION, self.close_success_banner)
+        self.banner_close_timer.start()
+
+    def delay_banner_close(self):
+        self.banner_close_timer.cancel()
+        self.banner_close_timer = None
 
     def close_success_banner(self):
-        # TODO : delay closing if mouse is currently over the "Open" button
         self.page.close(self.success_banner)
 
     def update_progress(self, render_progress):
