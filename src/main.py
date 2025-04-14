@@ -1,4 +1,5 @@
 import flet as ft
+import asyncio
 
 from business.MovieOptions import MovieOptions
 from business.Movie import Movie
@@ -34,8 +35,8 @@ async def main(page: ft.Page):
     video_preview = VideoPreview(script_area.script_field, page, options)
     await video_preview.update_preview('') # Generate original blank preview
 
-    async def vp_async_wrapper(t, _):
-        await video_preview.update_preview()
+    def vp_async_wrapper(t, _):
+        page.run_task(video_preview.update_preview)
 
     page.pubsub.subscribe_topic("preview", vp_async_wrapper)
 
