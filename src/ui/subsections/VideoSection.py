@@ -183,7 +183,12 @@ class VideoSection(ft.GestureDetector):
                             [
                                 self.font_family_input,
                                 self.font_size_input,
-                                self.font_border_switch
+                                ft.Text("px", size = UNIT_TEXT_SIZE),
+                                ft.Container(
+                                    content = self.font_border_switch,
+
+                                    margin = ft.margin.only(left = 20)
+                                )
                             ],
                             alignment = ft.MainAxisAlignment.CENTER
                         ),
