@@ -16,9 +16,20 @@ class MovieFrame:
     text: str
     text_size: int
     text_border: bool
+    text_border_size: int
     font_path: str
 
     UPLEFT_CORNER: ClassVar[Tuple[int, int]] = (0, 0)
+
+    @property
+    def palette(self):
+        return [
+            *tuple(self.bg_color), *tuple(~self.bg_color)
+        ]
+
+    @property
+    def stroke_width(self):
+        return self.text_border_size if self.text_border else 0
 
     def __invert__(self):
         return MovieFrame(
@@ -26,9 +37,15 @@ class MovieFrame:
             bg_color = ~self.bg_color,
             text = self.text,
             text_size = self.text_size,
+            text_border_size = self.text_border_size,
             text_border = self.text_border,
             font_path = self.font_path
         )
+
+    # TODO : we'll have to add font size to this,
+    # if we want to manage variable font size in movie
+    def __hash__(self):
+        return hash((self.text, tuple(self.bg_color)))
 
     def create_image(self):
 
@@ -63,18 +80,3 @@ class MovieFrame:
         frame_canvas.putpalette(self.palette)
 
         return frame_canvas
-
-    @property
-    def palette(self):
-        return [
-            *tuple(self.bg_color), *tuple(~self.bg_color)
-        ]
-
-    @property
-    def stroke_width(self):
-        return int(0.1 * self.text_size) if self.text_border else 0
-
-    # TODO : we'll have to add font size to this,
-    # if we want to manage variable font size in movie
-    def __hash__(self):
-        return hash((self.text, tuple(self.bg_color)))

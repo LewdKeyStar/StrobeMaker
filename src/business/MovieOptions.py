@@ -3,7 +3,6 @@ from typing import Tuple
 from textwrap import dedent
 from pathlib import Path
 
-
 from business.Resolution import Resolution
 
 from constants import (
@@ -41,12 +40,10 @@ class MovieOptions:
     output_framerate = 30
     output_path = ospath.join(DEFAULT_OUTPUT_PATH, "output.mp4")
 
-    def calculate_movie_length_frames(self, script):
-        frame_length = self.flash_duration * self.phrase_duration * len(script)
-        return frame_length
-
-    def calculate_movie_length_ms(self, script):
-        return 1000 * self.calculate_movie_length_frames(script) / self.output_framerate
+    @property
+    def text_border_size(self):
+        # TODO : replace arbitrary percentage with user-defined border size
+        return int(0.1 * self.text_size)
 
     @property
     def resolution(self):
@@ -61,6 +58,13 @@ class MovieOptions:
     @property
     def font_name(self):
         return Path(self.font).stem
+
+    def calculate_movie_length_frames(self, script):
+        frame_length = self.flash_duration * self.phrase_duration * len(script)
+        return frame_length
+
+    def calculate_movie_length_ms(self, script):
+        return 1000 * self.calculate_movie_length_frames(script) / self.output_framerate
 
     def get_video_section_blurb(self):
         return dedent(f"""
