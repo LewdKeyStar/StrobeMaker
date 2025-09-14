@@ -9,11 +9,6 @@ from utils.debounce import debounce
 
 DEBOUNCE_TIME = 0.5
 
-# This class is used to trigger video preview updates on option changes.
-# However, due to the Video control apparently not working on my system
-# (see #10),
-# it goes unused so far.
-
 @dataclass
 class MovieOptionsWrapper(MovieOptions):
 
