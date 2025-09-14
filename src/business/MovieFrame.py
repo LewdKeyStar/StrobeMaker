@@ -15,7 +15,6 @@ class MovieFrame:
     bg_color: ReversibleColor
     text: str
     text_size: int
-    text_border: bool
     text_border_size: int
     font_path: str
 
@@ -29,7 +28,7 @@ class MovieFrame:
 
     @property
     def stroke_width(self):
-        return self.text_border_size if self.text_border else 0
+        return self.text_border_size
 
     def __invert__(self):
         return MovieFrame(
@@ -38,7 +37,6 @@ class MovieFrame:
             text = self.text,
             text_size = self.text_size,
             text_border_size = self.text_border_size,
-            text_border = self.text_border,
             font_path = self.font_path
         )
 
@@ -72,7 +70,8 @@ class MovieFrame:
             ),
             self.text,
             font = font,
-            fill = BG_COLOR_INDEX if self.text_border else TEXT_COLOR_INDEX,
+            # This used to be a bool carried by the MovieFrame instance, but for auto-font logic it's in MovieOptions instead.
+            fill = BG_COLOR_INDEX if self.text_border_size > 0 else TEXT_COLOR_INDEX,
             stroke_fill = TEXT_COLOR_INDEX,
             stroke_width = self.stroke_width
         )

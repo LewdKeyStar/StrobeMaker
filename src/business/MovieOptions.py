@@ -43,7 +43,7 @@ class MovieOptions:
     @property
     def text_border_size(self):
         # TODO : replace arbitrary percentage with user-defined border size
-        return int(0.1 * self.text_size)
+        return int(0.1 * self.text_size) if self.text_border else 0
 
     @property
     def resolution(self):

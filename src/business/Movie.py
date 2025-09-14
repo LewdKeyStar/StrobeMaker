@@ -50,7 +50,6 @@ class Movie:
                     text = line.upper() if self.options.capitalize_all else line,
                     text_size = self.options.text_size,
                     text_border_size = self.options.text_border_size,
-                    text_border = self.options.text_border,
                     font_path = self.options.font_path
                 )
 
