@@ -73,6 +73,6 @@ class MovieOptions:
         - Flash duration : {self.flash_duration} frames
         - Phrase duration : {self.phrase_duration} flashes
         - Font family : {self.font_name}
-        - Font size : {self.text_size}pt
+        - Font size : {self.text_size}px
         - With border : {'Yes' if self.text_border else 'No'}
         """)
