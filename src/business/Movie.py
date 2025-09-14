@@ -3,7 +3,7 @@ import threading
 
 from dataclasses import dataclass
 
-from PIL import ImageOps
+from PIL import ImageOps, ImageFont
 from os import makedirs, symlink, path as ospath
 from shutil import rmtree
 
@@ -17,6 +17,10 @@ from utils.ffmpeg_progress import track_ffmpeg_progress
 
 from time import perf_counter
 
+# TODO : Ugly orphan constants, do something about this please
+OPTIMAL_TEXT_PERCENT_H = 0.75
+OPTIMAL_TEXT_PERCENT_W = 0.9
+
 @dataclass
 class Movie:
 
@@ -29,6 +33,49 @@ class Movie:
             *[image for i in range(self.options.flash_duration // 2)],
             *[inverted_image for i in range(self.options.flash_duration // 2)]
         ]
+
+    # Should be fired when auto font size is enabled whenever the script, border, resolution or font changes
+    # FIXME : uses the border size instead of zeroeing out if border is disabled !!
+    def get_auto_font_size(self):
+
+        # First, establish an upper limit : the percentage times the frame height.
+        # This is a constant for all lines of the script.
+
+        max_size_borderless = int(
+            OPTIMAL_TEXT_PERCENT_H * self.options.resolution_height
+        )
+
+        # In testing, it doesn't seem to make a difference whether the border size is calculated
+        # with the default size or max_size_borderless.
+        # However, for correctness purposes, we do it anyway.
+
+        calc_options = self.options.clone({'text_size': max_size_borderless})
+
+        # Now, we can establish a slightly lower limit, taking the potential text border into consideration.
+
+        max_size = \
+            max_size_borderless - 2 * calc_options.text_border_size
+
+        # However, the real size is determined by the longest line of the script,
+        # As it must still fit entirely within the frame.
+
+        longest_line = sorted(self.script, key = lambda line : len(line))[-1]
+
+        # We need a PIL ImageFont object to calculate the line size in pixels.
+
+        font = ImageFont.truetype(calc_options.font_path, max_size)
+
+        size = max_size
+        calc_options.text_size = size
+
+        # And now, until the longest line fits comfortably in the frame, we lower the size.
+
+        while font.getlength(longest_line) > OPTIMAL_TEXT_PERCENT_W * calc_options.resolution_width - 2 * calc_options.text_border_size:
+            size -= 1
+            calc_options.text_size = size
+            font = ImageFont.truetype(self.options.font_path, size)
+
+        return size
 
     def create_movie(self, *, fast = False, pubsub = None):
 
