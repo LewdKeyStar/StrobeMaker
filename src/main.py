@@ -24,23 +24,40 @@ async def main(page: ft.Page):
 
     page.update()
 
+    # Initialize page components
+
     script_area = ScriptArea(page, options)
+    dual_color_picker = DualColorPicker(page, options)
+    video_preview = VideoPreview(script_area.script_field, page, options)
+    video_section = VideoSection(page, options)
     generate_area = GenerateArea(page, options, script_area.script_field)
+
+    # Subscribe to pseudo-reactivity pubsub channels
 
     def progress_message_handler(t, render_progress):
         generate_area.update_progress(render_progress)
 
     page.pubsub.subscribe_topic("progress", progress_message_handler)
 
-    video_preview = VideoPreview(script_area.script_field, page, options)
-    await video_preview.update_preview('') # Generate original blank preview
+    def font_size_update_handler(t, _):
+        options.text_size = \
+            Movie(script_area.script_field.value.split('\n'), options).get_auto_font_size()
+
+        video_section.update_font_size_from_auto() # I despise non-reactive frameworks
+
+    page.pubsub.subscribe_topic("font_size", font_size_update_handler)
 
     def vp_async_wrapper(t, _):
         page.run_task(video_preview.update_preview)
 
     page.pubsub.subscribe_topic("preview", vp_async_wrapper)
 
-    dual_color_picker = DualColorPicker(page, options)
+    # Setup page through first call of pseudo-reactive handlers
+
+    await video_preview.update_preview('') # Generate original blank preview
+    font_size_update_handler(None, None) # Auto-calculate original font size
+
+    # Build page
 
     page.add(
         ft.Row(
@@ -96,7 +113,7 @@ async def main(page: ft.Page):
 
         ft.Row(
             [
-                VideoSection(page, options)
+                video_section
             ],
             alignment = ft.MainAxisAlignment.CENTER
         ),

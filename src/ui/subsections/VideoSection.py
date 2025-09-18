@@ -94,6 +94,14 @@ class VideoSection(ft.GestureDetector):
             user_on_change = lambda _ : self.update_display(move_focus = True)
         )
 
+        self.auto_font_size_switch = CustomSwitch(
+            options = self.options,
+            label = "Auto font size",
+            property = "auto_font_size",
+
+            user_on_change = lambda _ : self.update_display()
+        )
+
         self.font_size_input = NumberInput(
             self.page,
             self.options,
@@ -182,15 +190,25 @@ class VideoSection(ft.GestureDetector):
                         ft.Row(
                             [
                                 self.font_family_input,
-                                self.font_size_input,
-                                ft.Text("px", size = UNIT_TEXT_SIZE),
+                                ft.Column(
+                                    [
+                                        ft.Row(
+                                            [
+                                                self.font_size_input,
+                                                ft.Text("px", size = UNIT_TEXT_SIZE)
+                                            ]
+                                        ),
+                                        self.auto_font_size_switch
+                                    ]
+                                ),
                                 ft.Container(
                                     content = self.font_border_switch,
 
                                     margin = ft.margin.only(left = 20)
                                 )
                             ],
-                            alignment = ft.MainAxisAlignment.CENTER
+                            alignment = ft.MainAxisAlignment.CENTER,
+                            spacing = 40
                         ),
 
                         ft.Text("Frames per flash", size = SECTION_TEXT_SIZE),
@@ -267,3 +285,8 @@ class VideoSection(ft.GestureDetector):
 
         if self.page is not None:
             self.page.update()
+
+    def update_font_size_from_auto(self):
+        self.font_size_input.value = self.options.text_size
+        self.font_size_input.disabled = self.options.auto_font_size
+        self.update_blurb()
