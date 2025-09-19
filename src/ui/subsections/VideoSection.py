@@ -4,6 +4,7 @@ from ui.atoms.NumberInput import NumberInput
 from ui.atoms.CustomSlider import CustomSlider
 from ui.atoms.CustomSwitch import CustomSwitch
 from ui.atoms.CustomSearch import CustomSearch
+from ui.atoms.OrientationPicker import OrientationPicker
 
 from constants import FONT_LIST, DEFAULT_FONT_LABEL
 
@@ -70,6 +71,13 @@ class VideoSection(ft.GestureDetector):
             width = LARGE_NUMINPUT_WIDTH,
 
             user_on_change = lambda _ : self.update_display()
+        )
+
+        self.orientation_picker = OrientationPicker(
+            self.page,
+            self.options,
+
+            user_on_change = lambda _ : self.update_display(update_resolution = True)
         )
 
         self.fps_input = NumberInput(
@@ -166,13 +174,20 @@ class VideoSection(ft.GestureDetector):
                         ft.Text("Video profile", size = SECTION_TEXT_SIZE),
                         ft.Row(
                             [
-                                ft.Row(
+                                ft.Column(
                                     [
-                                        self.resolution_width_input,
-                                        ft.Text("x", size = UNIT_TEXT_SIZE),
-                                        self.resolution_height_input,
-                                        ft.Text("px", size = UNIT_TEXT_SIZE)
-                                    ]
+                                        self.orientation_picker,
+                                        ft.Row(
+                                            [
+                                                self.resolution_width_input,
+                                                ft.Text("x", size = UNIT_TEXT_SIZE),
+                                                self.resolution_height_input,
+                                                ft.Text("px", size = UNIT_TEXT_SIZE)
+                                            ]
+                                        )
+                                    ],
+
+                                    horizontal_alignment = ft.CrossAxisAlignment.CENTER
                                 ),
 
                                 ft.Row(
@@ -265,8 +280,12 @@ class VideoSection(ft.GestureDetector):
             color = BLURB_COLOR
         )
 
-    def update_display(self, *, update_second_durations = False, move_focus = False):
+    def update_display(self, *, update_resolution = False, update_second_durations = False, move_focus = False):
         self.update_blurb()
+
+        if update_resolution:
+            self.resolution_width_input.value = self.options.resolution_width
+            self.resolution_height_input.value = self.options.resolution_height
 
         if update_second_durations:
             flash_duration_seconds = self.options.flash_duration / self.options.output_framerate
