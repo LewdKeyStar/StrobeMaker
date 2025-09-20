@@ -9,7 +9,7 @@ from ui.CustomEvent import CustomEvent
 NUMBER_INPUT_WIDTH = 145
 
 ON_CHANGE_DEBOUNCE_TIME = 1.5
-LOOPED_DEBOUNCE_TIME = 0.1
+LOOPED_DEBOUNCE_TIME = 3
 
 class NumberInput(ft.TextField):
     def __init__(
