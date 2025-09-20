@@ -4,7 +4,9 @@ from ui.atoms.NumberInput import NumberInput
 from ui.atoms.CustomSlider import CustomSlider
 from ui.atoms.CustomSwitch import CustomSwitch
 from ui.atoms.CustomSearch import CustomSearch
+
 from ui.atoms.OrientationPicker import OrientationPicker
+from ui.atoms.ResolutionInput import ResolutionInput
 
 from constants import FONT_LIST, DEFAULT_FONT_LABEL
 
@@ -14,13 +16,6 @@ CONTENT_PADDING = 25
 
 EDIT_WINDOW_WIDTH = 1000
 EDIT_WINDOW_HEIGHT = 500
-
-LARGE_NUMINPUT_WIDTH = 150
-
-LOWRES_WIDTH = 256
-LOWRES_HEIGHT = 144
-HIGHRES_WIDTH = 3840
-HIGHRES_HEIGHT = 2160
 
 SECTION_TEXT_SIZE = 18
 UNIT_TEXT_SIZE = 16
@@ -47,37 +42,18 @@ class VideoSection(ft.GestureDetector):
             )
         )
 
-        self.resolution_width_input = NumberInput(
-            self.page,
-            self.options,
-            "resolution_width",
-
-            min = LOWRES_WIDTH,
-            max = HIGHRES_WIDTH,
-
-            width = LARGE_NUMINPUT_WIDTH,
-
-            user_on_change = lambda _ : self.update_display()
-        )
-
-        self.resolution_height_input = NumberInput(
-            self.page,
-            self.options,
-            "resolution_height",
-
-            min = LOWRES_HEIGHT,
-            max = HIGHRES_HEIGHT,
-
-            width = LARGE_NUMINPUT_WIDTH,
-
-            user_on_change = lambda _ : self.update_display()
-        )
-
         self.orientation_picker = OrientationPicker(
             self.page,
             self.options,
 
-            user_on_change = lambda _ : self.update_display(update_resolution = True)
+            user_on_change = lambda _ : self.update_display(update_orientation = True)
+        )
+
+        self.resolution_input = ResolutionInput(
+            self.page,
+            self.options,
+
+            user_on_change = lambda _ : self.update_display()
         )
 
         self.fps_input = NumberInput(
@@ -172,33 +148,33 @@ class VideoSection(ft.GestureDetector):
                 ft.Column(
                     [
                         ft.Text("Video profile", size = SECTION_TEXT_SIZE),
-                        ft.Row(
-                            [
-                                ft.Column(
-                                    [
-                                        self.orientation_picker,
-                                        ft.Row(
-                                            [
-                                                self.resolution_width_input,
-                                                ft.Text("x", size = UNIT_TEXT_SIZE),
-                                                self.resolution_height_input,
-                                                ft.Text("px", size = UNIT_TEXT_SIZE)
-                                            ]
-                                        )
-                                    ],
+                        ft.Container(
 
-                                    horizontal_alignment = ft.CrossAxisAlignment.CENTER
-                                ),
+                            content = ft.Row(
+                                [
+                                    ft.Column(
+                                        [
+                                            self.orientation_picker,
+                                            self.resolution_input
+                                        ],
 
-                                ft.Row(
-                                    [
-                                        self.fps_input,
-                                        ft.Text("fps", size = UNIT_TEXT_SIZE)
-                                    ]
-                                )
-                            ],
+                                        horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+                                        spacing = 5
+                                    ),
 
-                            alignment = ft.MainAxisAlignment.SPACE_EVENLY
+                                    ft.Row(
+                                        [
+                                            self.fps_input,
+                                            ft.Text("fps", size = UNIT_TEXT_SIZE)
+                                        ]
+                                    )
+                                ],
+
+                                alignment = ft.MainAxisAlignment.SPACE_EVENLY
+                            ),
+
+                            margin = ft.margin.only(top = -10)
+
                         ),
 
                         ft.Text("Text settings", size = SECTION_TEXT_SIZE),
@@ -280,12 +256,11 @@ class VideoSection(ft.GestureDetector):
             color = BLURB_COLOR
         )
 
-    def update_display(self, *, update_resolution = False, update_second_durations = False, move_focus = False):
+    def update_display(self, *, update_orientation = False, update_second_durations = False, move_focus = False):
         self.update_blurb()
 
-        if update_resolution:
-            self.resolution_width_input.value = self.options.resolution_width
-            self.resolution_height_input.value = self.options.resolution_height
+        if update_orientation:
+            self.resolution_input.update_orientation()
 
         if update_second_durations:
             flash_duration_seconds = self.options.flash_duration / self.options.output_framerate

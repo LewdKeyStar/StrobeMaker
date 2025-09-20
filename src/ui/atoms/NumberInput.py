@@ -4,6 +4,8 @@ import threading
 
 from utils.debounce import debounce
 
+from ui.CustomEvent import CustomEvent
+
 NUMBER_INPUT_WIDTH = 145
 
 ON_CHANGE_DEBOUNCE_TIME = 1.5
@@ -89,7 +91,12 @@ class NumberInput(ft.TextField):
         self.builtin_on_change(skip_clamp_correct = skip_clamp_correct)
 
         if self.user_on_change is not None:
-            self.user_on_change(None)
+            self.user_on_change(
+                CustomEvent(
+                    value = self.value,
+                    control = self
+                )
+            )
 
     # This needs to be a separate function from on_change_sum(),
     # Purely because it's debounced.
