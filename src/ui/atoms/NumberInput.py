@@ -3,13 +3,14 @@ import flet as ft
 import threading
 
 from utils.debounce import debounce
+from utils.throttle import throttle
 
 from ui.CustomEvent import CustomEvent
 
 NUMBER_INPUT_WIDTH = 145
 
 ON_CHANGE_DEBOUNCE_TIME = 1.5
-LOOPED_DEBOUNCE_TIME = 3
+LOOPED_THROTTLE_TIME = 0.075
 
 class NumberInput(ft.TextField):
     def __init__(
@@ -128,12 +129,15 @@ class NumberInput(ft.TextField):
 
         self.page.update()
 
+    @throttle(LOOPED_THROTTLE_TIME)
+    def increment_value_throttled(self, increment):
+        self.increment_value(increment)
+
     def loop_increment(self, increment):
 
-        @debounce(LOOPED_DEBOUNCE_TIME)
         def looped_increment(increment):
             while self.continue_loop:
-                self.increment_value(increment)
+                self.increment_value_throttled(increment)
 
         self.continue_loop = True
 
@@ -172,7 +176,7 @@ class NumberInput(ft.TextField):
 
     # By looking around, we can see that such features are in the dev docs,
     # (https://docs.flet.dev/types/keyrepeatevent/)
-    # Though absent from the user docs ; 
+    # Though absent from the user docs ;
     # So they will probably become available in the future.
 
     def on_keyboard_event(self, e):
