@@ -78,8 +78,14 @@ class NumberInput(ft.TextField):
             # A. It has been left inactive for a relatively long time (see ON_CHANGE_DEBOUNCE_TIME)
             on_change = lambda _ : self._on_change(),
             # or B. it has been blurred, and thus is no longer being edited.
-            on_blur = lambda e : self.on_change_sum()
+            on_blur = lambda e : self.on_change_sum(clear_focused_control = True),
+
+            # Signal to Page that any potential keyboard events are happening *here*
+            on_focus = lambda _ : self.set_self_as_focus()
         )
+
+    def set_self_as_focus(self):
+        self.page.control_in_focus = self
 
     def builtin_on_change(self, *, skip_clamp_correct = False):
         if not skip_clamp_correct:
@@ -87,7 +93,7 @@ class NumberInput(ft.TextField):
 
         setattr(self.options, self.property, self.value)
 
-    def on_change_sum(self, *, skip_clamp_correct = False):
+    def on_change_sum(self, *, skip_clamp_correct = False, clear_focused_control = False):
         self.builtin_on_change(skip_clamp_correct = skip_clamp_correct)
 
         if self.user_on_change is not None:
@@ -97,6 +103,9 @@ class NumberInput(ft.TextField):
                     control = self
                 )
             )
+
+        if clear_focused_control:
+            self.page.control_in_focus = None
 
     # This needs to be a separate function from on_change_sum(),
     # Purely because it's debounced.
@@ -155,3 +164,17 @@ class NumberInput(ft.TextField):
                 self.min,
                 min(self.max, val)
             )
+
+    # There is no way to implement looped_increment() with arrow keys,
+    # Because flet currently doesn't allow detection of key release
+    # (All keyboard events are keydowns)
+    # So there's no way to track if keys are being held.
+
+    # By looking around, we can see that such features are in the dev docs,
+    # (https://docs.flet.dev/types/keyrepeatevent/)
+    # Though absent from the user docs ; 
+    # So they will probably become available in the future.
+
+    def on_keyboard_event(self, e):
+        if e.key in ["Arrow Up", "Arrow Down"]:
+            self.increment_value(self.increment if e.key == "Arrow Up" else -self.increment)

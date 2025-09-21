@@ -32,6 +32,21 @@ async def main(page: ft.Page):
     video_section = VideoSection(page, options)
     generate_area = GenerateArea(page, options, script_area.script_field)
 
+    # Enable keyboard events
+    # ( not mouse, those are localized through GestureDetector :)) )
+
+    def on_keyboard_event_global(e):
+        if page.control_in_focus is not None \
+        and hasattr(page.control_in_focus, "on_keyboard_event") \
+        and callable(page.control_in_focus.on_keyboard_event):
+            page.control_in_focus.on_keyboard_event(e)
+
+
+    # BTW, this is a KeyDown. It doesn't wait until the key release.
+    # There's no way to detect holding down keys either.
+
+    page.on_keyboard_event = on_keyboard_event_global
+
     # Subscribe to pseudo-reactivity pubsub channels
 
     def progress_message_handler(t, render_progress):
