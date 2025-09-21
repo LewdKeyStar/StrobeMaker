@@ -35,6 +35,8 @@ async def main(page: ft.Page):
     # Enable keyboard events
     # ( not mouse, those are localized through GestureDetector :)) )
 
+    page.control_in_focus = None
+
     def on_keyboard_event_global(e):
         if page.control_in_focus is not None \
         and hasattr(page.control_in_focus, "on_keyboard_event") \
