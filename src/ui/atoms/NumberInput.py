@@ -182,3 +182,9 @@ class NumberInput(ft.TextField):
     def on_keyboard_event(self, e):
         if e.key in ["Arrow Up", "Arrow Down"]:
             self.increment_value(self.increment if e.key == "Arrow Up" else -self.increment)
+
+    def on_scroll_event(self, e):
+        if e.scroll_delta_y == 0:
+            return
+            
+        self.increment_value(self.increment if e.scroll_delta_y < 0 else -self.increment)

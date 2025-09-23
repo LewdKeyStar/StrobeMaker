@@ -1,6 +1,8 @@
 import flet as ft
 import asyncio
 
+from utils.misc_utils import has_method
+
 from business.MovieOptions import MovieOptions
 from business.Movie import Movie
 from utils.MovieOptionsWrapper import MovieOptionsWrapper
@@ -33,21 +35,38 @@ async def main(page: ft.Page):
     generate_area = GenerateArea(page, options, script_area.script_field)
 
     # Enable keyboard events
-    # ( not mouse, those are localized through GestureDetector :)) )
 
     page.control_in_focus = None
 
     def on_keyboard_event_global(e):
         if page.control_in_focus is not None \
-        and hasattr(page.control_in_focus, "on_keyboard_event") \
-        and callable(page.control_in_focus.on_keyboard_event):
+        and has_method(page.control_in_focus, "on_keyboard_event"):
             page.control_in_focus.on_keyboard_event(e)
-
 
     # BTW, this is a KeyDown. It doesn't wait until the key release.
     # There's no way to detect holding down keys either.
 
     page.on_keyboard_event = on_keyboard_event_global
+
+    # Define a handler for scroll events
+    # (GestureDetectors have separate handlers for each gesture,
+    # so I'm not defining stuff we're not using yet.)
+
+    # Notice the "page" parameter.
+
+    def on_scroll_event_global(e, page):
+        if page.control_in_focus is not None \
+        and has_method(page.control_in_focus, "on_scroll_event"):
+            page.control_in_focus.on_scroll_event(e)
+
+    # However, no GestureDetector is created here for this event,
+    # Because any receiving control would be in dialogs that appear higher in the overlay,
+    # And would overshadow the GestureDetector.
+    # As such, the specific sections instead instantiate their own GestureDetector,
+    # Using this provided handler via the page object property
+    # (Hence said handler requires a page argument so there is a page in scope on call site)
+
+    page.on_scroll_event_global = on_scroll_event_global
 
     # Subscribe to pseudo-reactivity pubsub channels
 

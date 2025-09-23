@@ -144,91 +144,95 @@ class VideoSection(ft.GestureDetector):
         self.edit_window = ft.AlertDialog(
             title = ft.Text("Edit video settings", text_align = ft.TextAlign.CENTER),
 
-            content = ft.Container(
-                ft.Column(
-                    [
-                        ft.Text("Video profile", size = SECTION_TEXT_SIZE),
-                        ft.Container(
+            content = ft.GestureDetector(
+                ft.Container(
+                    ft.Column(
+                        [
+                            ft.Text("Video profile", size = SECTION_TEXT_SIZE),
+                            ft.Container(
 
-                            content = ft.Row(
+                                content = ft.Row(
+                                    [
+                                        ft.Column(
+                                            [
+                                                self.orientation_picker,
+                                                self.resolution_input
+                                            ],
+
+                                            horizontal_alignment = ft.CrossAxisAlignment.CENTER,
+                                            spacing = 5
+                                        ),
+
+                                        ft.Row(
+                                            [
+                                                self.fps_input,
+                                                ft.Text("fps", size = UNIT_TEXT_SIZE)
+                                            ]
+                                        )
+                                    ],
+
+                                    alignment = ft.MainAxisAlignment.SPACE_EVENLY
+                                ),
+
+                                margin = ft.margin.only(top = -10)
+
+                            ),
+
+                            ft.Text("Text settings", size = SECTION_TEXT_SIZE),
+                            ft.Row(
                                 [
+                                    self.font_family_input,
                                     ft.Column(
                                         [
-                                            self.orientation_picker,
-                                            self.resolution_input
-                                        ],
-
-                                        horizontal_alignment = ft.CrossAxisAlignment.CENTER,
-                                        spacing = 5
-                                    ),
-
-                                    ft.Row(
-                                        [
-                                            self.fps_input,
-                                            ft.Text("fps", size = UNIT_TEXT_SIZE)
+                                            ft.Row(
+                                                [
+                                                    self.font_size_input,
+                                                    ft.Text("px", size = UNIT_TEXT_SIZE)
+                                                ]
+                                            ),
+                                            self.auto_font_size_switch
                                         ]
+                                    ),
+                                    ft.Container(
+                                        content = self.font_border_switch,
+
+                                        margin = ft.margin.only(left = 20)
                                     )
+                                ],
+                                alignment = ft.MainAxisAlignment.CENTER,
+                                spacing = 40
+                            ),
+
+                            ft.Text("Frames per flash", size = SECTION_TEXT_SIZE),
+                            ft.Row(
+                                [
+                                    self.flash_duration_slider,
+                                    self.flash_duration_seconds
                                 ],
 
                                 alignment = ft.MainAxisAlignment.SPACE_EVENLY
                             ),
 
-                            margin = ft.margin.only(top = -10)
+                            ft.Text("Flashes per phrase", size = SECTION_TEXT_SIZE),
+                            ft.Row(
+                                [
+                                    self.phrase_duration_slider,
+                                    self.phrase_duration_seconds
+                                ],
 
-                        ),
+                                alignment = ft.MainAxisAlignment.SPACE_EVENLY
+                            ),
 
-                        ft.Text("Text settings", size = SECTION_TEXT_SIZE),
-                        ft.Row(
-                            [
-                                self.font_family_input,
-                                ft.Column(
-                                    [
-                                        ft.Row(
-                                            [
-                                                self.font_size_input,
-                                                ft.Text("px", size = UNIT_TEXT_SIZE)
-                                            ]
-                                        ),
-                                        self.auto_font_size_switch
-                                    ]
-                                ),
-                                ft.Container(
-                                    content = self.font_border_switch,
+                            self.dummy_child
+                        ],
+                        alignment = ft.MainAxisAlignment.SPACE_BETWEEN
+                    ),
 
-                                    margin = ft.margin.only(left = 20)
-                                )
-                            ],
-                            alignment = ft.MainAxisAlignment.CENTER,
-                            spacing = 40
-                        ),
-
-                        ft.Text("Frames per flash", size = SECTION_TEXT_SIZE),
-                        ft.Row(
-                            [
-                                self.flash_duration_slider,
-                                self.flash_duration_seconds
-                            ],
-
-                            alignment = ft.MainAxisAlignment.SPACE_EVENLY
-                        ),
-
-                        ft.Text("Flashes per phrase", size = SECTION_TEXT_SIZE),
-                        ft.Row(
-                            [
-                                self.phrase_duration_slider,
-                                self.phrase_duration_seconds
-                            ],
-
-                            alignment = ft.MainAxisAlignment.SPACE_EVENLY
-                        ),
-
-                        self.dummy_child
-                    ],
-                    alignment = ft.MainAxisAlignment.SPACE_BETWEEN
+                    width = EDIT_WINDOW_WIDTH,
+                    height = EDIT_WINDOW_HEIGHT
                 ),
 
-                width = EDIT_WINDOW_WIDTH,
-                height = EDIT_WINDOW_HEIGHT
+                on_scroll = lambda e : self.page.on_scroll_event_global(e, self.page)
             )
         )
 

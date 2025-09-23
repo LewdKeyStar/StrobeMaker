@@ -9,6 +9,10 @@ def add_extension_if_missing(path, ext):
     true_ext = '.' + ext
     return path if path.endswith(true_ext) else path + true_ext
 
+def has_method(instance, method_name):
+    return hasattr(instance, method_name) \
+    and callable(getattr(instance, method_name))
+
 # Taken from https://github.com/kkroening/ffmpeg-python/blob/master/examples/show_progress.py#L8
 
 from contextlib import contextmanager
